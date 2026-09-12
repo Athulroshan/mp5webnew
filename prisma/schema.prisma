@@ -1,0 +1,244 @@
+// Prisma schema for MPSS - My Profile Sourcing Solutions
+// Uses SQLite for local development
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User model ───────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          String    @default("user") // "user" | "admin"
+  avatar        String    @default("")
+  phone         String    @default("")
+  // Address stored as JSON for flexibility
+  address       String    @default("{}") // JSON: { street, city, state, zipCode, country }
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  reviews  Review[]
+  orders   Order[]
+}
+
+// ─── Product model ────────────────────────────────────────
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  price           Float
+  originalPrice   Float?
+  category        String   // "T-Shirts" | "Hoodies" | "Pants" | "Accessories" | "Shoes" | "Custom"
+  subcategory     String   @default("")
+  brand           String   @default("")
+  images          String   @default("[]")  // JSON array: [{ url, alt }]
+  videos          String   @default("[]")  // JSON array: [{ url, title, thumbnail }]
+  colors          String   @default("[]")  // JSON array: [{ name, hex, available }]
+  sizes           String   @default("[]")  // JSON array: [{ name, available, stock }]
+  stock           Int      @default(0)
+  sku             String   @unique
+  tags            String   @default("[]")  // JSON array
+  features        String   @default("[]")  // JSON array
+  specifications  String   @default("{}") // JSON: { material, weight, dimensions, care }
+  ratingsAverage  Float    @default(0)
+  ratingsCount    Int      @default(0)
+  badge           String   @default("")    // "Sale" | "Best Seller" | "New" | "Popular" etc
+  isCustomizable  Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  discount        String   @default("{}") // JSON: { percentage, validUntil }
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reviews    Review[]
+  orderItems OrderItem[]
+}
+
+// ─── Review model ─────────────────────────────────────────
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // 1-5
+  comment   String   @default("")
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId]) // One review per user per product
+}
+
+// ─── Order model ──────────────────────────────────────────
+model Order {
+  id                String    @id @default(cuid())
+  orderNumber       String    @unique
+  userId            String
+  status            String    @default("pending") // pending | confirmed | processing | shipped | delivered | cancelled
+  paymentStatus     String    @default("pending") // pending | paid | failed | refunded
+  paymentMethod     String    // credit_card | debit_card | paypal | bank_transfer | cash_on_delivery
+  subtotal          Float
+  tax               Float     @default(0)
+  shipping          Float     @default(0)
+  discount          Float     @default(0)
+  total             Float
+  shippingAddress   String    // JSON
+  billingAddress    String    @default("{}") // JSON
+  tracking          String    @default("{}") // JSON: { number, carrier, url }
+  notes             String    @default("{}") // JSON: { customer, internal }
+  estimatedDelivery DateTime?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+  cancelledAt       DateTime?
+  cancellationReason String   @default("")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items OrderItem[]
+}
+
+// ─── Order Item model ─────────────────────────────────────
+model OrderItem {
+  id            String @id @default(cuid())
+  orderId       String
+  productId     String
+  quantity      Int
+  price         Float
+  size          String @default("")
+  color         String @default("") // JSON: { name, hex }
+  customization String @default("{}") // JSON
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// ─── Contact Inquiry model ────────────────────────────────
+model ContactInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  message   String
+  service   String   @default("") // Which service they're inquiring about
+  status    String   @default("new") // new | read | replied
+  createdAt DateTime @default(now())
+}
+
+// ─── Inspection Digitization Models ───────────────────────
+model Inspection {
+  id                 String   @id @default(cuid())
+  inspectionNumber   String   @unique
+  poNumber           String   @default("")
+  poQuantity         Int      @default(0)
+  inspectionQuantity Int      @default(0)
+  factoryName        String   @default("")
+  agentName          String   @default("")
+  season             String   @default("")
+  buyerBrand         String   @default("")
+  styleNumber        String   @default("")
+  productDescription String   @default("")
+  inspectionDate     String   @default("")
+  inspectorName      String   @default("")
+  visualAuditResult  String   @default("PASS") // PASS | FAIL
+  packingAuditResult String   @default("PASS") // PASS | FAIL | ON HOLD
+  overallResult      String   @default("PASS") // PASS | FAIL | ON HOLD
+  comments           String   @default("")
+  itemsToCheck       String   @default("[]") // JSON string of 22 checklist items
+  shipmentDetails    String   @default("{}") // JSON string of order/shipment details
+  cartonDetails      String   @default("[]") // JSON string of packing list breakdown
+  capDetails         String   @default("[]") // JSON string of Corrective Action Plan rows
+  status             String   @default("draft") // draft | ready_for_review | finalized | revised
+  currentVersion     Int      @default(1)
+  finalizedAt        DateTime?
+  finalizedBy        String   @default("")
+  excelFilePath      String   @default("")
+  driveUrl           String   @default("")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  measurements InspectionMeasurement[]
+  photos       InspectionPhoto[]
+  defects      InspectionDefect[]
+  versions     InspectionVersion[]
+  auditLogs    InspectionAuditLog[]
+}
+
+model InspectionVersion {
+  id                String     @id @default(cuid())
+  inspectionId     String
+  versionNumber    Int
+  excelFilePath    String     @default("")
+  changeReason     String     @default("")
+  createdByName    String     @default("")
+  inspectionPayload String    @default("{}") // JSON string snapshot
+  createdAt        DateTime   @default(now())
+
+  inspection       Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+
+model InspectionAuditLog {
+  id             String     @id @default(cuid())
+  inspectionId   String
+  versionNumber  Int        @default(1)
+  action         String     // CREATED | DRAFT_UPDATED | REPORT_GENERATED | FINALIZED | REOPENED | REVISION_CREATED
+  performedByName String    @default("QA Auditor")
+  details        String     @default("")
+  timestamp      DateTime   @default(now())
+
+  inspection     Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+
+model InspectionMeasurement {
+  id               String     @id @default(cuid())
+  inspectionId     String
+  measurementPoint String
+  specRequired     String     @default("")
+  tolerance        String     @default("")
+  actualValues     String     @default("[]") // JSON string array
+  result           String     @default("PASS") // PASS | FAIL
+  inspection       Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+
+model InspectionPhoto {
+  id           String     @id @default(cuid())
+  inspectionId String
+  type         String     // "measurement" | "inspection" | "defect"
+  photoUrl     String
+  description  String     @default("")
+  inspection   Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+
+model InspectionDefect {
+  id           String     @id @default(cuid())
+  inspectionId String
+  defectCode   String
+  description  String     @default("")
+  location     String     @default("")
+  severity     String     @default("Major") // Critical | Major | Minor
+  quantity     Int        @default(1)
+  photoUrl     String     @default("")
+  inspection   Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+}
+
+model InspectionTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  filePath    String
+  isMaster    Boolean  @default(true)
+  mappedCells String   @default("{}") // JSON mapping configuration
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
