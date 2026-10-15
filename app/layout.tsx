@@ -22,7 +22,7 @@ const inter = Inter({
 
 function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isStudio = pathname?.startsWith("/customization");
+  const isStudio = pathname?.startsWith("/customization") || pathname?.startsWith("/custom-studio");
   const isHome = pathname === "/";
 
   if (isStudio) {

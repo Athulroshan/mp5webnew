@@ -47,14 +47,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { id } = await params;
     const body = await req.json();
 
-    // Check if record exists
     const existing = await prisma.inspection.findUnique({ where: { id } });
     if (!existing) {
-      console.error(`[BACKEND VALIDATION ERROR] Update rejected: Inspection ID ${id} not found.`);
-      return NextResponse.json(
-        { error: `Inspection ID '${id}' not found. Cannot update non-existent draft.`, rejectedFields: ['id'] },
-        { status: 404 }
-      );
+      console.warn(`[BACKEND NOTICE] Inspection ID ${id} not found in DB during PATCH; redirecting to POST handler.`);
+      // If draft ID doesn't exist yet, we can create it cleanly
+      const createRes = await fetch(new URL('/api/inspections', req.url).toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...body, id }),
+      });
+      const data = await createRes.json();
+      return NextResponse.json(data, { status: createRes.status });
     }
 
     const {
@@ -84,41 +87,28 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       currentVersion,
     } = body;
 
-    // Validate essential fields
-    const missingFields: string[] = [];
-    if (!poNumber && poNumber !== '') missingFields.push('poNumber');
-    if (!factoryName && factoryName !== '') missingFields.push('factoryName');
-    
-    if (missingFields.length > 0) {
-      console.error('[BACKEND VALIDATION ERROR] Rejected update payload missing required fields:', missingFields);
-      return NextResponse.json(
-        { error: `Validation failed. Missing required fields: ${missingFields.join(', ')}`, rejectedFields: missingFields },
-        { status: 400 }
-      );
-    }
-
     const updated = await prisma.inspection.update({
       where: { id },
       data: {
-        poNumber: poNumber ?? existing.poNumber,
+        poNumber: poNumber !== undefined ? String(poNumber) : existing.poNumber,
         poQuantity: poQuantity !== undefined ? Number(poQuantity) : existing.poQuantity,
         inspectionQuantity: inspectionQuantity !== undefined ? Number(inspectionQuantity) : existing.inspectionQuantity,
-        factoryName: factoryName ?? existing.factoryName,
-        agentName: agentName ?? existing.agentName,
-        season: season ?? existing.season,
-        buyerBrand: buyerBrand ?? existing.buyerBrand,
-        styleNumber: styleNumber ?? existing.styleNumber,
-        productDescription: productDescription ?? existing.productDescription,
-        inspectionDate: inspectionDate ?? existing.inspectionDate,
-        inspectorName: inspectorName ?? existing.inspectorName,
+        factoryName: factoryName !== undefined ? String(factoryName) : existing.factoryName,
+        agentName: agentName !== undefined ? String(agentName) : existing.agentName,
+        season: season !== undefined ? String(season) : existing.season,
+        buyerBrand: buyerBrand !== undefined ? String(buyerBrand) : existing.buyerBrand,
+        styleNumber: styleNumber !== undefined ? String(styleNumber) : existing.styleNumber,
+        productDescription: productDescription !== undefined ? String(productDescription) : existing.productDescription,
+        inspectionDate: inspectionDate !== undefined ? String(inspectionDate) : existing.inspectionDate,
+        inspectorName: inspectorName !== undefined ? String(inspectorName) : existing.inspectorName,
         visualAuditResult: visualAuditResult ?? existing.visualAuditResult,
         packingAuditResult: packingAuditResult ?? existing.packingAuditResult,
         overallResult: overallResult ?? existing.overallResult,
-        comments: comments ?? existing.comments,
-        itemsToCheck: JSON.stringify(itemsToCheck),
-        shipmentDetails: JSON.stringify(shipmentDetails),
-        cartonDetails: JSON.stringify(cartonDetails),
-        capDetails: JSON.stringify(capDetails),
+        comments: comments !== undefined ? String(comments) : existing.comments,
+        itemsToCheck: typeof itemsToCheck === 'string' ? itemsToCheck : JSON.stringify(itemsToCheck),
+        shipmentDetails: typeof shipmentDetails === 'string' ? shipmentDetails : JSON.stringify(shipmentDetails),
+        cartonDetails: typeof cartonDetails === 'string' ? cartonDetails : JSON.stringify(cartonDetails),
+        capDetails: typeof capDetails === 'string' ? capDetails : JSON.stringify(capDetails),
         status: status ?? existing.status,
         currentVersion: currentVersion ?? existing.currentVersion,
       },
@@ -126,27 +116,25 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     // Update child tables
     await prisma.inspectionMeasurement.deleteMany({ where: { inspectionId: id } });
-    await prisma.inspectionDefect.deleteMany({ where: { inspectionId: id } });
-    await prisma.inspectionPhoto.deleteMany({ where: { inspectionId: id } });
-
     if (measurements.length > 0) {
       await prisma.inspectionMeasurement.createMany({
         data: measurements.map((m: any) => ({
           inspectionId: id,
-          measurementPoint: m.measurementPoint,
+          measurementPoint: m.measurementPoint || '',
           specRequired: m.specRequired || '',
           tolerance: m.tolerance || '',
-          actualValues: JSON.stringify(m.actualValues || []),
+          actualValues: typeof m.actualValues === 'string' ? m.actualValues : JSON.stringify(m.actualValues || []),
           result: m.result || 'PASS',
         })),
       });
     }
 
+    await prisma.inspectionDefect.deleteMany({ where: { inspectionId: id } });
     if (defects.length > 0) {
       await prisma.inspectionDefect.createMany({
         data: defects.map((d: any) => ({
           inspectionId: id,
-          defectCode: d.defectCode,
+          defectCode: d.defectCode || '',
           description: d.description || '',
           location: d.location || '',
           severity: d.severity || 'Major',
@@ -156,12 +144,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       });
     }
 
+    await prisma.inspectionPhoto.deleteMany({ where: { inspectionId: id } });
     if (photos.length > 0) {
       await prisma.inspectionPhoto.createMany({
         data: photos.map((p: any) => ({
           inspectionId: id,
           type: p.type || 'inspection',
-          photoUrl: p.photoUrl,
+          photoUrl: p.photoUrl || '',
           description: p.description || '',
         })),
       });

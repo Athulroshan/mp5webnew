@@ -1,0 +1,96 @@
+{
+  "audit": {
+    "sheetName": "Audit",
+    "cells": {
+      "productDescription": "B4",
+      "inspectionTeam": "F4",
+      "inspectionDate": "I4",
+      "reportNumber": "B5",
+      "agency": "D5",
+      "styleNumber": "F5",
+      "customer": "B6",
+      "factoryName": "D6",
+      "orderQuantity": "F6",
+      "account": "B7",
+      "factoryLocation": "D7",
+      "poNumber": "F7",
+      "inspectorName": "B8",
+      "countryOfOrigin": "D8",
+      "season": "F8",
+      "colorWays": "E9",
+      "size": "E10",
+      "shipmentDate": "H4",
+      "sampleType": "A14",
+      "inspectionType": "B14",
+      "orderType": "C14",
+      "totalCartons": "D14",
+      "shipBySea": "E14",
+      "shipByAir": "E15",
+      "qtyShipped": "H14",
+      "qtyAvailable": "I14",
+      "aqlLevel": "B20",
+      "inspectedQty": "C20",
+      "criticalAccept": "E20",
+      "majorAccept": "E21",
+      "minorAccept": "E22",
+      "criticalTotal": "E23",
+      "majorTotal": "E24",
+      "minorTotal": "E25",
+      "passed": "F20",
+      "failed": "F21",
+      "pending": "F22",
+      "needImprovement": "F23",
+      "comments": "G20"
+    },
+    "itemsToCheckStartRow": 28,
+    "itemsToCheckCount": 22,
+    "defectsStartRow": 52
+  },
+  "packingList": {
+    "sheetName": "PACKING LIST",
+    "cells": {
+      "reportNumber": "F2",
+      "date": "B4",
+      "styleNumber": "B5",
+      "orderQty": "B6",
+      "factory": "D4",
+      "poNumber": "D5",
+      "cutQty": "D6",
+      "location": "F4",
+      "colours": "F5",
+      "shipQty": "F6"
+    },
+    "photosStartRow": 8
+  },
+  "measure": {
+    "sheetName": "MEASURE",
+    "cells": {
+      "factory": "B3",
+      "vpnStyle": "B4",
+      "purchaseOrder": "E3",
+      "styleDescription": "E4",
+      "auditDate": "H3"
+    },
+    "photosStartRow": 7
+  },
+  "inspectionPhotos": {
+    "sheetName": "Inspection photos",
+    "grid": {
+      "colsPerRow": 2,
+      "startRow": 4,
+      "rowSpacing": 14,
+      "col1": { "startCol": 1, "endCol": 4 },
+      "col2": { "startCol": 5, "endCol": 8 }
+    }
+  },
+  "defectsPhotos": {
+    "sheetName": "Defects photos",
+    "grid": {
+      "colsPerRow": 2,
+      "startRow": 4,
+      "rowSpacing": 14,
+      "col1": { "startCol": 1, "endCol": 4 },
+      "col2": { "startCol": 5, "endCol": 8 }
+    }
+  }
+}

@@ -73,7 +73,7 @@ export async function generateInspectionExcelReport(
   }
 
   // Master Template MUST NEVER BE MUTATED DIRECTLY - Copy FRESH for every report generation
-  const masterTemplatePath = path.join(process.cwd(), 'public', 'templates', 'MPSS BLANK REPORT.xlsx');
+  const masterTemplatePath = path.join(process.cwd(), 'templates', 'MPSS BLANK REPORT.xlsx');
   if (!fs.existsSync(masterTemplatePath)) {
     throw new Error(`Master template missing at ${masterTemplatePath}`);
   }

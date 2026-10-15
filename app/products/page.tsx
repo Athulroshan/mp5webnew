@@ -456,10 +456,8 @@ function ProductsPageInner() {
 
             {/* Mobile Filter Trigger */}
             <Sheet>
-              <SheetTrigger>
-                <Button variant="outline" size="sm" className="sm:hidden text-xs font-medium border-gray-200">
-                  <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" /> Filters
-                </Button>
+              <SheetTrigger render={<Button variant="outline" size="sm" className="sm:hidden text-xs font-medium border-gray-200" />}>
+                <SlidersHorizontal className="h-3.5 w-3.5 mr-1.5" /> Filters
               </SheetTrigger>
               <SheetContent side="left" className="w-72">
                 <SheetHeader>

@@ -1,252 +1,22 @@
-/**
- * CanvasStage — Main editor canvas area.
- *
- * Architecture:
- *   ┌─────────────────────────────────┐
- *   │  R3F 3D canvas (shirt/color)    │ ← background
- *   │  + 2D HTML Canvas overlay       │ ← design images + handles
- *   └─────────────────────────────────┘
- *
- * Interaction model:
- *   pointer-down → hit-test handles → start drag/resize/rotate
- *   pointer-move → update transform (via ref, no re-render during drag)
- *   pointer-up   → commit to EditorContext (triggers R3F decal update)
- *
- * Export:
- *   1. Capture R3F WebGL canvas via preserveDrawingBuffer
- *   2. Composite design images on offscreen canvas
- *   3. Trigger PNG download
- */
 "use client";
 
 import React, {
-  useRef, useEffect, useCallback, useState, forwardRef, useImperativeHandle,
+  useRef,
+  useCallback,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
 } from "react";
-import { Trash2, Eye, EyeOff, ArrowUp, ArrowDown } from "lucide-react";
-import { Design, PrintArea, PRINT_AREAS, ViewKey, Handle, HandleId } from "./types";
+import * as THREE from "three";
+import { Trash2, Eye, EyeOff, ArrowUp, ArrowDown, Upload, Sparkles } from "lucide-react";
 import { useEditor } from "./editor-context";
 import { R3FCanvas } from "@/components/customization/r3f-canvas";
-import { ShirtDecalItem } from "@/components/customization/shirt-model";
-
-// ─── Constants ────────────────────────────────────────────────────────────
-
-const HANDLE_RADIUS = 6;
-const ROT_HANDLE_OFFSET = 28; // px above top-center
-
-// ─── Coordinate helpers ────────────────────────────────────────────────────
-
-function designToCanvas(
-  d: Design, area: PrintArea, cw: number, ch: number
-): { cx: number; cy: number } {
-  return {
-    cx: (area.left + d.x * area.width) * cw,
-    cy: (area.top + d.y * area.height) * ch,
-  };
-}
-
-function getDesignPixelSize(
-  d: Design, img: HTMLImageElement, area: PrintArea, cw: number
-): { w: number; h: number } {
-  const baseW = area.width * cw * 0.40; // 40% of print area at scale=1
-  const aspect = img.naturalWidth / img.naturalHeight;
-  return {
-    w: baseW * d.scale * (aspect >= 1 ? 1 : aspect),
-    h: baseW * d.scale * (aspect >= 1 ? 1 / aspect : 1),
-  };
-}
-
-function isInsideRotatedRect(
-  px: number, py: number,
-  cx: number, cy: number,
-  w: number, h: number,
-  rotDeg: number,
-  padding = 8
-): boolean {
-  const dx = px - cx;
-  const dy = py - cy;
-  const rad = (-rotDeg * Math.PI) / 180;
-  const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
-  const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
-  return Math.abs(rx) <= w / 2 + padding && Math.abs(ry) <= h / 2 + padding;
-}
-
-// ─── Canvas rendering ─────────────────────────────────────────────────────
-
-async function renderOverlay(
-  canvas: HTMLCanvasElement,
-  designs: Design[],
-  selectedId: string | null,
-  area: PrintArea,
-  imageCache: Map<string, HTMLImageElement>,
-  zoom: number
-) {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  const cw = canvas.width;
-  const ch = canvas.height;
-
-  ctx.clearRect(0, 0, cw, ch);
-
-  // Draw print area guide (very subtle)
-  ctx.save();
-  ctx.strokeStyle = "rgba(124,58,237,0.12)";
-  ctx.setLineDash([6, 4]);
-  ctx.lineWidth = 1;
-  ctx.strokeRect(area.left * cw, area.top * ch, area.width * cw, area.height * ch);
-  ctx.setLineDash([]);
-  ctx.restore();
-
-  // Draw designs back-to-front (sorted by zIndex)
-  const sorted = [...designs].sort((a, b) => a.zIndex - b.zIndex);
-
-  for (const d of sorted) {
-    if (!d.visible) continue;
-    const img = imageCache.get(d.url);
-    if (!img) continue;
-
-    const { cx, cy } = designToCanvas(d, area, cw, ch);
-    const { w, h } = getDesignPixelSize(d, img, area, cw);
-    const rotRad = (d.rotation * Math.PI) / 180;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rotRad);
-    ctx.globalAlpha = 1;
-    ctx.drawImage(img, -w / 2, -h / 2, w, h);
-
-    // Selection box + handles
-    if (d.id === selectedId) {
-      ctx.strokeStyle = "#7c3aed";
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(-w / 2 - 4, -h / 2 - 4, w + 8, h + 8);
-
-      // Corner + edge handles
-      const pts: [number, number][] = [
-        [-w / 2 - 4, -h / 2 - 4], [0, -h / 2 - 4], [w / 2 + 4, -h / 2 - 4],
-        [-w / 2 - 4, 0],                             [w / 2 + 4, 0],
-        [-w / 2 - 4,  h / 2 + 4], [0,  h / 2 + 4], [w / 2 + 4,  h / 2 + 4],
-      ];
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#7c3aed";
-      ctx.lineWidth = 1.5;
-      pts.forEach(([hx, hy]) => {
-        ctx.beginPath();
-        ctx.arc(hx, hy, HANDLE_RADIUS, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-      });
-
-      // Rotation handle line + circle
-      ctx.strokeStyle = "#7c3aed";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(0, -h / 2 - 4);
-      ctx.lineTo(0, -h / 2 - 4 - ROT_HANDLE_OFFSET);
-      ctx.stroke();
-
-      ctx.fillStyle = "#7c3aed";
-      ctx.beginPath();
-      ctx.arc(0, -h / 2 - 4 - ROT_HANDLE_OFFSET, HANDLE_RADIUS + 1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 9px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("↻", 0, -h / 2 - 4 - ROT_HANDLE_OFFSET);
-    }
-
-    ctx.restore();
-  }
-}
-
-// ─── Build R3F decal list from designs ────────────────────────────────────
-
-function buildDecals(
-  designs: Design[],
-  view: ViewKey,
-  area: PrintArea,
-  canvasW: number,
-  canvasH: number,
-  imageCache: Map<string, HTMLImageElement>
-): ShirtDecalItem[] {
-  const decalPositions: Record<ViewKey, [number, number, number]> = {
-    front:      [0,  1.25,  0.32],
-    back:       [0,  1.25, -0.32],
-    leftSleeve: [-0.65, 1.25, 0.0],
-    rightSleeve:[0.65,  1.25, 0.0],
-  };
-  const decalRotations: Record<ViewKey, [number, number, number]> = {
-    front:      [0, 0, 0],
-    back:       [0, Math.PI, 0],
-    leftSleeve: [0, -Math.PI / 2, 0],
-    rightSleeve:[0,  Math.PI / 2, 0],
-  };
-
-  return designs.filter(d => d.visible).map(d => {
-    const img = imageCache.get(d.url);
-    const aspect = img ? img.naturalWidth / img.naturalHeight : 1;
-    const baseScale = 0.30 * d.scale;
-    const [br, bg, bb] = decalRotations[view];
-    const rotRad = (d.rotation * Math.PI) / 180;
-
-    // Offset position within the decal plane
-    const offsetX = (d.x - 0.5) * 0.6;
-    const offsetY = -(d.y - 0.5) * 0.6;
-    const [bx, by, bz] = decalPositions[view];
-
-    return {
-      id: d.id,
-      url: d.url,
-      targetMeshKey: view === "front" ? "Object_10" :
-                     view === "back"  ? "Object_14" :
-                     view === "leftSleeve" ? "Object_18" : "Object_20",
-      position: [bx + offsetX, by + offsetY, bz] as [number,number,number],
-      rotation: [br, bg, bb + rotRad] as [number,number,number],
-      scale: [baseScale * aspect, baseScale, 0.6] as [number,number,number],
-    };
-  });
-}
-
-// ─── Hit test helpers ─────────────────────────────────────────────────────
-
-function hitTestHandle(
-  px: number, py: number,
-  cx: number, cy: number,
-  w: number, h: number,
-  rotDeg: number
-): HandleId | null {
-  const rotRad = (-rotDeg * Math.PI) / 180;
-
-  // Rotate point back to design space
-  const dx = px - cx;
-  const dy = py - cy;
-  const lx = dx * Math.cos(rotRad) - dy * Math.sin(rotRad);
-  const ly = dx * Math.sin(rotRad) + dy * Math.cos(rotRad);
-
-  const hw = w / 2 + 4;
-  const hh = h / 2 + 4;
-  const r = HANDLE_RADIUS + 4;
-
-  // Check rotation handle (in local coords at top-center, above selection box)
-  const rotHandleY = -(h / 2 + 4 + ROT_HANDLE_OFFSET);
-  if (Math.hypot(lx - 0, ly - rotHandleY) <= r + 4) return "rot";
-
-  // Check 8 resize handles
-  const handles: [HandleId, number, number][] = [
-    ["tl", -hw, -hh], ["tc", 0, -hh], ["tr", hw, -hh],
-    ["ml", -hw, 0  ],                  ["mr", hw, 0  ],
-    ["bl", -hw,  hh], ["bc", 0,  hh], ["br", hw,  hh],
-  ];
-  for (const [id, hx, hy] of handles) {
-    if (Math.hypot(lx - hx, ly - hy) <= r) return id;
-  }
-
-  // Body drag zone
-  if (Math.abs(lx) <= hw && Math.abs(ly) <= hh) return "body";
-  return null;
-}
-
-// ─── Component ────────────────────────────────────────────────────────────
+import {
+  ShirtDecalItem,
+  getDefaultDecalAnchor,
+} from "@/components/customization/shirt-model";
+import { Design, ViewKey } from "./types";
 
 export interface CanvasStageRef {
   exportPNG: () => void;
@@ -254,362 +24,319 @@ export interface CanvasStageRef {
 
 export const CanvasStage = forwardRef<CanvasStageRef>((_, ref) => {
   const { state, dispatch, currentDesigns } = useEditor();
-  const { currentView, selectedDesignId, shirtColor, partColors, zoom } = state;
+  const {
+    currentView,
+    selectedDesignId,
+    shirtColor,
+    partColors,
+    garmentStyle,
+    zoom,
+  } = state;
 
-  const overlayRef = useRef<HTMLCanvasElement>(null);
+  const r3fGlRef = useRef<THREE.WebGLRenderer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const r3fGlRef = useRef<any>(null);       // Three.js renderer
-  const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
-  const renderRAF = useRef<number | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  // Drag state (refs — no re-render during move)
-  const dragRef = useRef<{
-    type: HandleId;
-    designId: string;
-    startX: number;
-    startY: number;
-    origDesign: Design;
-  } | null>(null);
-
-  // ── Load images ──────────────────────────────────────────────────────────
-
-  const loadImage = useCallback((url: string): Promise<HTMLImageElement> => {
-    if (imageCacheRef.current.has(url)) {
-      return Promise.resolve(imageCacheRef.current.get(url)!);
-    }
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => { imageCacheRef.current.set(url, img); resolve(img); };
-      img.onerror = reject;
-      img.src = url;
-    });
-  }, []);
-
-  // Preload all design images
-  useEffect(() => {
-    currentDesigns.forEach((d) => loadImage(d.url).catch(() => {}));
-  }, [currentDesigns, loadImage]);
-
-  // ── Sync canvas size to container ────────────────────────────────────────
-
-  useEffect(() => {
-    const sync = () => {
-      const overlay = overlayRef.current;
-      const container = containerRef.current;
-      if (!overlay || !container) return;
-      const rect = container.getBoundingClientRect();
-      if (overlay.width !== rect.width || overlay.height !== rect.height) {
-        overlay.width = rect.width;
-        overlay.height = rect.height;
-      }
-    };
-    sync();
-    const ro = new ResizeObserver(sync);
-    if (containerRef.current) ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, []);
-
-  // ── Render overlay ────────────────────────────────────────────────────────
-
-  const scheduleRender = useCallback(() => {
-    if (renderRAF.current) return;
-    renderRAF.current = requestAnimationFrame(async () => {
-      renderRAF.current = null;
-      const overlay = overlayRef.current;
-      if (!overlay) return;
-      const area = PRINT_AREAS[currentView];
-      await renderOverlay(overlay, currentDesigns, selectedDesignId, area, imageCacheRef.current, zoom);
-    });
-  }, [currentDesigns, selectedDesignId, currentView, zoom]);
-
-  useEffect(() => { scheduleRender(); }, [scheduleRender]);
-
-  // ── Pointer events ────────────────────────────────────────────────────────
-
-  const getCanvasPoint = (e: React.PointerEvent | PointerEvent): [number, number] => {
-    const overlay = overlayRef.current!;
-    const rect = overlay.getBoundingClientRect();
-    return [
-      ((e.clientX - rect.left) / rect.width) * overlay.width,
-      ((e.clientY - rect.top) / rect.height) * overlay.height,
-    ];
-  };
-
-  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const overlay = overlayRef.current;
-    if (!overlay) return;
-    const [px, py] = getCanvasPoint(e);
-    const cw = overlay.width;
-    const ch = overlay.height;
-    const area = PRINT_AREAS[currentView];
-
-    // Sorted top-to-bottom (last = topmost visually)
-    const sorted = [...currentDesigns]
-      .sort((a, b) => a.zIndex - b.zIndex)
-      .reverse();
-
-    for (const d of sorted) {
-      if (!d.visible) continue;
-      const img = imageCacheRef.current.get(d.url);
-      if (!img) continue;
-      const { cx, cy } = designToCanvas(d, area, cw, ch);
-      const { w, h } = getDesignPixelSize(d, img, area, cw);
-
-      // If this design is selected, check handles first
-      if (d.id === selectedDesignId) {
-        const hid = hitTestHandle(px, py, cx, cy, w, h, d.rotation);
-        if (hid) {
-          dispatch({ type: "SELECT_DESIGN", payload: d.id });
-          dragRef.current = {
-            type: hid, designId: d.id, startX: px, startY: py, origDesign: { ...d },
-          };
-          return;
-        }
-      }
-
-      // Hit test body of any design
-      if (isInsideRotatedRect(px, py, cx, cy, w, h, d.rotation)) {
-        dispatch({ type: "SELECT_DESIGN", payload: d.id });
-        dragRef.current = {
-          type: "body", designId: d.id, startX: px, startY: py, origDesign: { ...d },
-        };
+  // ── Drag & Drop file upload on Canvas Stage (PNG/JPG/WEBP) ───────────────
+  const processUploadedFile = useCallback(
+    (file: File) => {
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file (PNG, JPG, or WEBP).");
         return;
       }
-    }
-
-    // Click on empty area — deselect
-    dispatch({ type: "SELECT_DESIGN", payload: null });
-  }, [currentDesigns, selectedDesignId, currentView, dispatch]);
-
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    const drag = dragRef.current;
-    if (!drag) return;
-    const overlay = overlayRef.current;
-    if (!overlay) return;
-
-    const [px, py] = getCanvasPoint(e);
-    const cw = overlay.width;
-    const ch = overlay.height;
-    const area = PRINT_AREAS[currentView];
-    const img = imageCacheRef.current.get(drag.origDesign.url);
-    if (!img) return;
-
-    const { origDesign, startX, startY, type } = drag;
-    const { cx, cy } = designToCanvas(origDesign, area, cw, ch);
-    const { w, h } = getDesignPixelSize(origDesign, img, area, cw);
-
-    let changes: Partial<Design> = {};
-
-    if (type === "body") {
-      // Drag: move design
-      const deltaX = (px - startX) / (area.width * cw);
-      const deltaY = (py - startY) / (area.height * ch);
-      changes = {
-        x: Math.max(0, Math.min(1, origDesign.x + deltaX)),
-        y: Math.max(0, Math.min(1, origDesign.y + deltaY)),
-      };
-    } else if (type === "rot") {
-      // Rotation: angle from design center to mouse
-      const angle = Math.atan2(py - cy, px - cx) * 180 / Math.PI + 90;
-      changes = { rotation: ((angle % 360) + 360) % 360 };
-    } else {
-      // Scale: distance-based proportional resize
-      const origDist = Math.hypot(startX - cx, startY - cy);
-      const newDist  = Math.hypot(px - cx, py - cy);
-      if (origDist > 1) {
-        const factor = newDist / origDist;
-        changes = { scale: Math.max(0.1, Math.min(3, origDesign.scale * factor)) };
+      if (file.size > 50 * 1024 * 1024) {
+        alert("File exceeds 50 MB limit.");
+        return;
       }
-    }
 
-    // Live update: mutate overlay canvas directly (no state dispatch) for performance
-    const d = currentDesigns.find((d) => d.id === drag.designId);
-    if (d) {
-      const preview = { ...d, ...changes };
-      const previewDesigns = currentDesigns.map((dd) =>
-        dd.id === drag.designId ? preview : dd
-      );
-      renderOverlay(overlay, previewDesigns, drag.designId, area, imageCacheRef.current, state.zoom);
-    }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const url = e.target?.result as string;
+        if (!url) return;
 
-    // Store changes for commit on pointer-up
-    drag.origDesign = { ...drag.origDesign, ...changes };
-  }, [currentDesigns, currentView, state.zoom]);
-
-  const handlePointerUp = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    const drag = dragRef.current;
-    dragRef.current = null;
-    if (!drag) return;
-
-    // Commit final position to context (this pushes to history)
-    dispatch({
-      type: "UPDATE_DESIGN",
-      payload: {
-        view: currentView,
-        id: drag.designId,
-        changes: {
-          x: drag.origDesign.x,
-          y: drag.origDesign.y,
-          scale: drag.origDesign.scale,
-          rotation: drag.origDesign.rotation,
-        },
-      },
-    });
-  }, [currentView, dispatch]);
-
-  // ── Keyboard shortcuts ─────────────────────────────────────────────────
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const meta = e.ctrlKey || e.metaKey;
-      if (meta && e.key === "z" && !e.shiftKey) { e.preventDefault(); dispatch({ type: "UNDO" }); }
-      if (meta && (e.key === "Z" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); dispatch({ type: "REDO" }); }
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedDesignId) {
-        dispatch({ type: "DELETE_DESIGN", payload: { view: currentView, id: selectedDesignId } });
-      }
-      // Arrow keys: fine movement
-      if (selectedDesignId && ["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-        const delta = e.shiftKey ? 0.05 : 0.005;
-        const d = currentDesigns.find((d) => d.id === selectedDesignId);
-        if (!d) return;
-        const changes: Partial<Design> = {
-          x: e.key === "ArrowLeft"  ? Math.max(0, d.x - delta)
-           : e.key === "ArrowRight" ? Math.min(1, d.x + delta) : d.x,
-          y: e.key === "ArrowUp"    ? Math.max(0, d.y - delta)
-           : e.key === "ArrowDown"  ? Math.min(1, d.y + delta) : d.y,
+        const maxZ = Math.max(0, ...currentDesigns.map((d) => d.zIndex));
+        const newDesign: Design = {
+          id: `design-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          url,
+          name: file.name.replace(/\.[^/.]+$/, ""),
+          x: 0.5,
+          y: 0.45,
+          scale: 1.0,
+          rotation: 0,
+          visible: true,
+          zIndex: maxZ + 1,
         };
-        dispatch({ type: "UPDATE_DESIGN", payload: { view: currentView, id: selectedDesignId, changes } });
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [selectedDesignId, currentView, currentDesigns, dispatch]);
 
-  // ── Build R3F decals ─────────────────────────────────────────────────
-
-  const decals = buildDecals(
-    currentDesigns, currentView,
-    PRINT_AREAS[currentView],
-    overlayRef.current?.width || 800,
-    overlayRef.current?.height || 600,
-    imageCacheRef.current
+        dispatch({
+          type: "ADD_DESIGN",
+          payload: { view: currentView, design: newDesign },
+        });
+      };
+      reader.readAsDataURL(file);
+    },
+    [currentDesigns, currentView, dispatch]
   );
 
-  // ── Export ────────────────────────────────────────────────────────────
+  const handleStageDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    Array.from(e.dataTransfer.files)
+      .filter((f) => f.type.startsWith("image/"))
+      .forEach(processUploadedFile);
+  };
 
-  const exportPNG = useCallback(async () => {
-    const overlay = overlayRef.current;
-    if (!overlay) return;
+  // ── Compile 3D Decals from EditorContext designs ──────────────────────────
+  const decals: ShirtDecalItem[] = useMemo(() => {
+    const list: ShirtDecalItem[] = [];
 
-    // 1. Capture R3F WebGL canvas
-    const gl3Ref = r3fGlRef.current;
-    const webglCanvas = gl3Ref?.domElement as HTMLCanvasElement | undefined;
+    // Map designs from ALL views so they remain visible when rotating 3D view
+    const allViews: ViewKey[] = ["front", "back", "leftSleeve", "rightSleeve"];
 
-    const out = document.createElement("canvas");
-    out.width = overlay.width;
-    out.height = overlay.height;
-    const ctx = out.getContext("2d")!;
+    allViews.forEach((v) => {
+      const viewDesigns = state.designs[v] || [];
+      const anchor = getDefaultDecalAnchor(garmentStyle, v);
 
-    // Draw shirt (3D canvas or white fallback)
-    if (webglCanvas) {
-      try { ctx.drawImage(webglCanvas, 0, 0, out.width, out.height); } catch {}
-    } else {
-      ctx.fillStyle = shirtColor;
-      ctx.fillRect(0, 0, out.width, out.height);
+      // Coordinate scaling based on style
+      const rangeX = garmentStyle === "hoodie" ? 45 : garmentStyle === "polo" ? 0.22 : 0.25;
+      const rangeY = garmentStyle === "hoodie" ? 45 : garmentStyle === "polo" ? 0.22 : 0.30;
+      const rangeZ = garmentStyle === "hoodie" ? 20 : garmentStyle === "polo" ? 0.15 : 0.18;
+
+      viewDesigns
+        .filter((d) => d.visible)
+        .forEach((d) => {
+          let px = anchor.position[0];
+          let py = anchor.position[1];
+          let pz = anchor.position[2];
+
+          if (v === "front") {
+            px += (d.x - 0.5) * rangeX;
+            py -= (d.y - 0.5) * rangeY;
+          } else if (v === "back") {
+            px -= (d.x - 0.5) * rangeX;
+            py -= (d.y - 0.5) * rangeY;
+          } else if (v === "leftSleeve") {
+            pz -= (d.x - 0.5) * rangeZ;
+            py -= (d.y - 0.5) * rangeY;
+          } else if (v === "rightSleeve") {
+            pz += (d.x - 0.5) * rangeZ;
+            py -= (d.y - 0.5) * rangeY;
+          }
+
+          const rotRad = (d.rotation * Math.PI) / 180;
+          const rx = anchor.rotation[0];
+          const ry = anchor.rotation[1];
+          const rz = anchor.rotation[2] + rotRad;
+
+          list.push({
+            id: d.id,
+            url: d.url,
+            view: v,
+            position: [px, py, pz],
+            rotation: [rx, ry, rz],
+            scale: anchor.baseScale * d.scale,
+            scaleFactor: d.scale,
+            rotationDeg: d.rotation,
+          });
+        });
+    });
+
+    return list;
+  }, [state.designs, garmentStyle]);
+
+  // ── Click-To-Place and Drag-To-Move 3D Decal ──────────────────────────────
+  const handlePointerHit = useCallback(
+    (hit: { point: [number, number, number]; meshKey?: string }) => {
+      // Find active design to place
+      const targetId = selectedDesignId || currentDesigns[currentDesigns.length - 1]?.id;
+      if (!targetId) return;
+
+      const anchor = getDefaultDecalAnchor(garmentStyle, currentView);
+      const rangeX = garmentStyle === "hoodie" ? 45 : garmentStyle === "polo" ? 0.22 : 0.25;
+      const rangeY = garmentStyle === "hoodie" ? 45 : garmentStyle === "polo" ? 0.22 : 0.30;
+
+      let newX = 0.5;
+      let newY = 0.5;
+
+      if (currentView === "front" || currentView === "back") {
+        const signX = currentView === "back" ? -1 : 1;
+        newX = 0.5 + (signX * (hit.point[0] - anchor.position[0])) / rangeX;
+        newY = 0.5 - (hit.point[1] - anchor.position[1]) / rangeY;
+      } else {
+        newX = 0.5 - (hit.point[2] - anchor.position[2]) / rangeX;
+        newY = 0.5 - (hit.point[1] - anchor.position[1]) / rangeY;
+      }
+
+      newX = Math.max(0.05, Math.min(0.95, newX));
+      newY = Math.max(0.05, Math.min(0.95, newY));
+
+      dispatch({
+        type: "UPDATE_DESIGN",
+        payload: {
+          view: currentView,
+          id: targetId,
+          changes: { x: newX, y: newY },
+        },
+      });
+    },
+    [selectedDesignId, currentDesigns, garmentStyle, currentView, dispatch]
+  );
+
+  const handleDecalDragMove = useCallback(
+    (hit: { point: [number, number, number] }) => {
+      handlePointerHit(hit);
+    },
+    [handlePointerHit]
+  );
+
+  // ── Export PNG via gl.domElement.toDataURL with preserveDrawingBuffer ──────
+  const exportPNG = useCallback(() => {
+    const gl = r3fGlRef.current;
+    if (!gl || !gl.domElement) {
+      alert("3D canvas is still initializing. Please wait a moment.");
+      return;
     }
 
-    // Draw designs
-    const area = PRINT_AREAS[currentView];
-    const sorted = [...currentDesigns].filter(d => d.visible).sort((a, b) => a.zIndex - b.zIndex);
-    for (const d of sorted) {
-      const img = imageCacheRef.current.get(d.url);
-      if (!img) continue;
-      const { cx, cy } = designToCanvas(d, area, out.width, out.height);
-      const { w, h } = getDesignPixelSize(d, img, area, out.width);
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate((d.rotation * Math.PI) / 180);
-      ctx.drawImage(img, -w / 2, -h / 2, w, h);
-      ctx.restore();
-    }
-
-    // Download
-    out.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
+    try {
+      // Export directly from WebGL canvas
+      const dataUrl = gl.domElement.toDataURL("image/png");
       const a = document.createElement("a");
-      a.href = url;
-      a.download = `mpss-custom-tshirt-${Date.now()}.png`;
+      a.href = dataUrl;
+      a.download = `mpss-${garmentStyle}-custom-${Date.now()}.png`;
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
-    }, "image/png");
-  }, [currentDesigns, currentView, shirtColor]);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Export failed:", err);
+      alert("Failed to export image. Please try again.");
+    }
+  }, [garmentStyle]);
 
   useImperativeHandle(ref, () => ({ exportPNG }), [exportPNG]);
 
-  // Selected design for toolbar
   const selectedDesign = currentDesigns.find((d) => d.id === selectedDesignId);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden"
+      className="relative w-full h-full overflow-hidden select-none"
       style={{ background: "#eef2f6" }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+      }}
+      onDragLeave={() => setIsDragOver(false)}
+      onDrop={handleStageDrop}
     >
-      {/* 3D shirt canvas (background) */}
+      {/* Interactive 3D WebGL Canvas */}
       <R3FCanvas
         bodyColor={partColors.body || shirtColor}
         neckColor={partColors.collar || shirtColor}
-        garmentStyle={state.garmentStyle}
+        garmentStyle={garmentStyle}
         partColors={partColors}
         currentView={currentView}
-        materialRoughness={state.material.id === "cotton" ? 0.7 : state.material.id === "polyester" ? 0.35 : state.material.id === "dry-fit" ? 0.4 : 0.6}
+        zoom={zoom}
+        materialRoughness={
+          state.material.id === "cotton"
+            ? 0.7
+            : state.material.id === "polyester"
+            ? 0.35
+            : state.material.id === "dry-fit"
+            ? 0.4
+            : 0.6
+        }
         materialMetalness={state.material.id === "polyester" ? 0.1 : 0.03}
         decals={decals}
         className="w-full h-full"
-        onGlReady={(gl) => { r3fGlRef.current = gl; }}
+        onPointerHit={handlePointerHit}
+        onDecalDragMove={handleDecalDragMove}
+        onGlReady={(gl) => {
+          r3fGlRef.current = gl;
+        }}
       />
 
-      {/* 2D interaction overlay */}
-      <canvas
-        ref={overlayRef}
-        className="absolute inset-0 w-full h-full"
-        style={{ cursor: dragRef.current ? "grabbing" : "default", touchAction: "none" }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-      />
+      {/* Drag & Drop Visual Indicator Overlay */}
+      {isDragOver && (
+        <div className="absolute inset-0 bg-violet-600/20 backdrop-blur-xs border-4 border-dashed border-violet-500 rounded-2xl flex flex-col items-center justify-center pointer-events-none z-20 transition-all">
+          <div className="bg-white p-5 rounded-2xl shadow-2xl flex flex-col items-center gap-2 text-violet-700 animate-bounce">
+            <Upload className="w-8 h-8 text-violet-600" />
+            <p className="font-extrabold text-sm">Drop Artwork Image Here</p>
+            <p className="text-xs text-slate-500">Projects automatically via 3D Decal</p>
+          </div>
+        </div>
+      )}
 
-      {/* Floating toolbar for selected design */}
+      {/* 3D Click & Drag placement hint */}
+      {currentDesigns.length > 0 && (
+        <div className="absolute top-3 left-4 pointer-events-none z-10 flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur rounded-xl border border-slate-200/60 shadow-xs text-[11px] text-slate-600 font-medium">
+          <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+          <span>Click anywhere on garment to place logo • Drag to move</span>
+        </div>
+      )}
+
+      {/* Floating Toolbar for Selected Artwork */}
       {selectedDesign && (
-        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-gray-900/90 backdrop-blur text-white px-3 py-2 rounded-full shadow-xl text-xs z-20">
-          <span className="text-gray-300 max-w-[100px] truncate">{selectedDesign.name}</span>
-          <div className="w-px h-4 bg-gray-600" />
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-2xl text-xs z-20 border border-white/10 animate-in fade-in slide-in-from-bottom-2">
+          <span className="text-slate-200 max-w-[120px] truncate font-semibold">
+            {selectedDesign.name}
+          </span>
+          <div className="w-px h-4 bg-slate-700" />
           <button
-            onClick={() => dispatch({ type: "BRING_FORWARD", payload: { view: currentView, id: selectedDesignId! } })}
-            className="p-1 rounded hover:bg-gray-700 transition-colors"
+            type="button"
+            onClick={() =>
+              dispatch({
+                type: "BRING_FORWARD",
+                payload: { view: currentView, id: selectedDesignId! },
+              })
+            }
+            className="p-1 rounded-lg hover:bg-slate-700 transition-colors"
             title="Bring forward"
-          ><ArrowUp className="h-3 w-3" /></button>
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </button>
           <button
-            onClick={() => dispatch({ type: "SEND_BACKWARD", payload: { view: currentView, id: selectedDesignId! } })}
-            className="p-1 rounded hover:bg-gray-700 transition-colors"
+            type="button"
+            onClick={() =>
+              dispatch({
+                type: "SEND_BACKWARD",
+                payload: { view: currentView, id: selectedDesignId! },
+              })
+            }
+            className="p-1 rounded-lg hover:bg-slate-700 transition-colors"
             title="Send backward"
-          ><ArrowDown className="h-3 w-3" /></button>
+          >
+            <ArrowDown className="h-3.5 w-3.5" />
+          </button>
           <button
-            onClick={() => dispatch({ type: "TOGGLE_VISIBLE", payload: { view: currentView, id: selectedDesignId! } })}
-            className="p-1 rounded hover:bg-gray-700 transition-colors"
+            type="button"
+            onClick={() =>
+              dispatch({
+                type: "TOGGLE_VISIBLE",
+                payload: { view: currentView, id: selectedDesignId! },
+              })
+            }
+            className="p-1 rounded-lg hover:bg-slate-700 transition-colors"
             title="Toggle visibility"
-          >{selectedDesign.visible ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3 text-gray-400" />}</button>
-          <div className="w-px h-4 bg-gray-600" />
+          >
+            {selectedDesign.visible ? (
+              <Eye className="h-3.5 w-3.5 text-emerald-400" />
+            ) : (
+              <EyeOff className="h-3.5 w-3.5 text-slate-500" />
+            )}
+          </button>
+          <div className="w-px h-4 bg-slate-700" />
           <button
-            onClick={() => dispatch({ type: "DELETE_DESIGN", payload: { view: currentView, id: selectedDesignId! } })}
-            className="p-1 rounded hover:bg-red-700 text-red-400 transition-colors"
-            title="Delete (Del)"
-          ><Trash2 className="h-3 w-3" /></button>
+            type="button"
+            onClick={() =>
+              dispatch({
+                type: "DELETE_DESIGN",
+                payload: { view: currentView, id: selectedDesignId! },
+              })
+            }
+            className="p-1 rounded-lg hover:bg-red-600/30 text-red-400 transition-colors"
+            title="Delete artwork"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
     </div>

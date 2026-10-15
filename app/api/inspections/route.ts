@@ -3,14 +3,37 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/**
+ * Generate inspection number once on creation.
+ * Format: FI_MPSS_#### with an incrementing 4-digit counter.
+ * Once assigned, it is never changed on autosaves or updates.
+ */
 async function generateInspectionNumber(): Promise<string> {
-  const year = new Date().getFullYear();
-  let count = await prisma.inspection.count();
-  let nextNum = count + 1;
-  let candidate = `INS-${year}-${nextNum.toString().padStart(5, '0')}`;
+  const existing = await prisma.inspection.findMany({
+    select: { inspectionNumber: true },
+  });
+
+  let maxNum = 0;
+  for (const item of existing) {
+    const match = item.inspectionNumber?.match(/^FI_MPSS_(\d+)$/i);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+  }
+
+  // If no FI_MPSS_ records found, base initial counter on total existing inspections
+  if (maxNum === 0) {
+    maxNum = existing.length;
+  }
+
+  let nextNum = maxNum + 1;
+  let candidate = `FI_MPSS_${nextNum.toString().padStart(4, '0')}`;
   while (await prisma.inspection.findUnique({ where: { inspectionNumber: candidate } })) {
     nextNum++;
-    candidate = `INS-${year}-${nextNum.toString().padStart(5, '0')}`;
+    candidate = `FI_MPSS_${nextNum.toString().padStart(4, '0')}`;
   }
   return candidate;
 }
@@ -49,21 +72,22 @@ export async function POST(req: Request) {
     const body = await req.json();
     const {
       id,
-      poNumber,
-      poQuantity,
-      inspectionQuantity,
-      factoryName,
-      agentName,
-      season,
-      buyerBrand,
-      styleNumber,
-      productDescription,
-      inspectionDate,
-      inspectorName,
-      visualAuditResult,
-      packingAuditResult,
-      overallResult,
-      comments,
+      inspectionNumber: providedInspectionNumber,
+      poNumber = '',
+      poQuantity = 0,
+      inspectionQuantity = 0,
+      factoryName = '',
+      agentName = '',
+      season = '',
+      buyerBrand = '',
+      styleNumber = '',
+      productDescription = '',
+      inspectionDate = new Date().toISOString().split('T')[0],
+      inspectorName = '',
+      visualAuditResult = 'PASS',
+      packingAuditResult = 'PASS',
+      overallResult = 'PASS',
+      comments = '',
       itemsToCheck = [],
       shipmentDetails = {},
       cartonDetails = [],
@@ -75,99 +99,117 @@ export async function POST(req: Request) {
       currentVersion = 1,
     } = body;
 
-    // Validate fields
-    const missingFields: string[] = [];
-    if (poNumber === undefined || poNumber === null) missingFields.push('poNumber');
-    if (factoryName === undefined || factoryName === null) missingFields.push('factoryName');
-
-    if (missingFields.length > 0) {
-      console.error('[BACKEND VALIDATION ERROR] Draft save rejected missing fields:', missingFields);
-      return NextResponse.json(
-        {
-          error: `Validation failed: Required field(s) [${missingFields.join(', ')}] missing.`,
-          rejectedFields: missingFields,
-        },
-        { status: 400 }
-      );
-    }
-
     let inspection;
 
     if (id) {
       // Check if existing record exists
       const existing = await prisma.inspection.findUnique({ where: { id } });
-      if (!existing) {
-        console.error(`[BACKEND VALIDATION ERROR] Update failed. Inspection ID '${id}' not found in DB.`);
-        return NextResponse.json({ error: `Inspection draft '${id}' not found.` }, { status: 404 });
+      if (existing) {
+        // Update existing draft. CRITICAL: Never regenerate inspectionNumber on update!
+        inspection = await prisma.inspection.update({
+          where: { id },
+          data: {
+            poNumber: poNumber ?? '',
+            poQuantity: Number(poQuantity) || 0,
+            inspectionQuantity: Number(inspectionQuantity) || 0,
+            factoryName: factoryName ?? '',
+            agentName: agentName ?? '',
+            season: season ?? '',
+            buyerBrand: buyerBrand ?? '',
+            styleNumber: styleNumber ?? '',
+            productDescription: productDescription ?? '',
+            inspectionDate: inspectionDate || new Date().toISOString().split('T')[0],
+            inspectorName: inspectorName ?? '',
+            visualAuditResult: visualAuditResult ?? 'PASS',
+            packingAuditResult: packingAuditResult ?? 'PASS',
+            overallResult: overallResult ?? 'PASS',
+            comments: comments ?? '',
+            itemsToCheck: typeof itemsToCheck === 'string' ? itemsToCheck : JSON.stringify(itemsToCheck),
+            shipmentDetails: typeof shipmentDetails === 'string' ? shipmentDetails : JSON.stringify(shipmentDetails),
+            cartonDetails: typeof cartonDetails === 'string' ? cartonDetails : JSON.stringify(cartonDetails),
+            capDetails: typeof capDetails === 'string' ? capDetails : JSON.stringify(capDetails),
+            status: status || existing.status,
+            currentVersion: Number(currentVersion) || existing.currentVersion,
+          },
+        });
+
+        await prisma.inspectionAuditLog.create({
+          data: {
+            inspectionId: id,
+            versionNumber: inspection.currentVersion,
+            action: 'DRAFT_UPDATED',
+            performedByName: inspectorName || 'QA Auditor',
+            details: `Updated draft details for PO: ${poNumber || 'N/A'}`,
+          },
+        });
+      } else {
+        // ID provided but not found: create record with this ID and generate inspectionNumber ONCE
+        const inspectionNumber = providedInspectionNumber || (await generateInspectionNumber());
+        inspection = await prisma.inspection.create({
+          data: {
+            id,
+            inspectionNumber,
+            poNumber: poNumber ?? '',
+            poQuantity: Number(poQuantity) || 0,
+            inspectionQuantity: Number(inspectionQuantity) || 0,
+            factoryName: factoryName ?? '',
+            agentName: agentName ?? '',
+            season: season ?? '',
+            buyerBrand: buyerBrand ?? '',
+            styleNumber: styleNumber ?? '',
+            productDescription: productDescription ?? '',
+            inspectionDate: inspectionDate || new Date().toISOString().split('T')[0],
+            inspectorName: inspectorName ?? '',
+            visualAuditResult: visualAuditResult ?? 'PASS',
+            packingAuditResult: packingAuditResult ?? 'PASS',
+            overallResult: overallResult ?? 'PASS',
+            comments: comments ?? '',
+            itemsToCheck: typeof itemsToCheck === 'string' ? itemsToCheck : JSON.stringify(itemsToCheck),
+            shipmentDetails: typeof shipmentDetails === 'string' ? shipmentDetails : JSON.stringify(shipmentDetails),
+            cartonDetails: typeof cartonDetails === 'string' ? cartonDetails : JSON.stringify(cartonDetails),
+            capDetails: typeof capDetails === 'string' ? capDetails : JSON.stringify(capDetails),
+            status: status || 'draft',
+            currentVersion: 1,
+          },
+        });
+
+        await prisma.inspectionAuditLog.create({
+          data: {
+            inspectionId: inspection.id,
+            versionNumber: 1,
+            action: 'CREATED',
+            performedByName: inspectorName || 'QA Auditor',
+            details: `Created new inspection record ${inspectionNumber}`,
+          },
+        });
       }
-
-      inspection = await prisma.inspection.update({
-        where: { id },
-        data: {
-          poNumber: poNumber || '',
-          poQuantity: Number(poQuantity) || 0,
-          inspectionQuantity: Number(inspectionQuantity) || 0,
-          factoryName: factoryName || '',
-          agentName: agentName || '',
-          season: season || '',
-          buyerBrand: buyerBrand || '',
-          styleNumber: styleNumber || '',
-          productDescription: productDescription || '',
-          inspectionDate: inspectionDate || new Date().toISOString().split('T')[0],
-          inspectorName: inspectorName || '',
-          visualAuditResult: visualAuditResult || 'PASS',
-          packingAuditResult: packingAuditResult || 'PASS',
-          overallResult: overallResult || 'PASS',
-          comments: comments || '',
-          itemsToCheck: JSON.stringify(itemsToCheck),
-          shipmentDetails: JSON.stringify(shipmentDetails),
-          cartonDetails: JSON.stringify(cartonDetails),
-          capDetails: JSON.stringify(capDetails),
-          status,
-          currentVersion,
-        },
-      });
-
-      await prisma.inspectionMeasurement.deleteMany({ where: { inspectionId: id } });
-      await prisma.inspectionDefect.deleteMany({ where: { inspectionId: id } });
-      await prisma.inspectionPhoto.deleteMany({ where: { inspectionId: id } });
-
-      await prisma.inspectionAuditLog.create({
-        data: {
-          inspectionId: id,
-          versionNumber: currentVersion,
-          action: 'DRAFT_UPDATED',
-          performedByName: inspectorName || 'QA Auditor',
-          details: `Updated draft details for PO: ${poNumber || 'N/A'}`,
-        },
-      });
     } else {
-      // Create fresh ONCE
-      const inspectionNumber = await generateInspectionNumber();
-      console.log(`[BACKEND ACTION] Creating new inspection draft with unique inspectionNumber: ${inspectionNumber}`);
+      // First-time creation: generate inspectionNumber ONCE
+      const inspectionNumber = providedInspectionNumber || (await generateInspectionNumber());
+      console.log(`[BACKEND ACTION] Creating new inspection draft with permanent report number: ${inspectionNumber}`);
       inspection = await prisma.inspection.create({
         data: {
           inspectionNumber,
-          poNumber: poNumber || '',
+          poNumber: poNumber ?? '',
           poQuantity: Number(poQuantity) || 0,
           inspectionQuantity: Number(inspectionQuantity) || 0,
-          factoryName: factoryName || '',
-          agentName: agentName || '',
-          season: season || '',
-          buyerBrand: buyerBrand || '',
-          styleNumber: styleNumber || '',
-          productDescription: productDescription || '',
+          factoryName: factoryName ?? '',
+          agentName: agentName ?? '',
+          season: season ?? '',
+          buyerBrand: buyerBrand ?? '',
+          styleNumber: styleNumber ?? '',
+          productDescription: productDescription ?? '',
           inspectionDate: inspectionDate || new Date().toISOString().split('T')[0],
-          inspectorName: inspectorName || '',
-          visualAuditResult: visualAuditResult || 'PASS',
-          packingAuditResult: packingAuditResult || 'PASS',
-          overallResult: overallResult || 'PASS',
-          comments: comments || '',
-          itemsToCheck: JSON.stringify(itemsToCheck),
-          shipmentDetails: JSON.stringify(shipmentDetails),
-          cartonDetails: JSON.stringify(cartonDetails),
-          capDetails: JSON.stringify(capDetails),
-          status,
+          inspectorName: inspectorName ?? '',
+          visualAuditResult: visualAuditResult ?? 'PASS',
+          packingAuditResult: packingAuditResult ?? 'PASS',
+          overallResult: overallResult ?? 'PASS',
+          comments: comments ?? '',
+          itemsToCheck: typeof itemsToCheck === 'string' ? itemsToCheck : JSON.stringify(itemsToCheck),
+          shipmentDetails: typeof shipmentDetails === 'string' ? shipmentDetails : JSON.stringify(shipmentDetails),
+          cartonDetails: typeof cartonDetails === 'string' ? cartonDetails : JSON.stringify(cartonDetails),
+          capDetails: typeof capDetails === 'string' ? capDetails : JSON.stringify(capDetails),
+          status: status || 'draft',
           currentVersion: 1,
         },
       });
@@ -185,24 +227,27 @@ export async function POST(req: Request) {
 
     const currentId = inspection.id;
 
+    // Synchronize nested relationships
+    await prisma.inspectionMeasurement.deleteMany({ where: { inspectionId: currentId } });
     if (measurements.length > 0) {
       await prisma.inspectionMeasurement.createMany({
         data: measurements.map((m: any) => ({
           inspectionId: currentId,
-          measurementPoint: m.measurementPoint,
+          measurementPoint: m.measurementPoint || '',
           specRequired: m.specRequired || '',
           tolerance: m.tolerance || '',
-          actualValues: JSON.stringify(m.actualValues || []),
+          actualValues: typeof m.actualValues === 'string' ? m.actualValues : JSON.stringify(m.actualValues || []),
           result: m.result || 'PASS',
         })),
       });
     }
 
+    await prisma.inspectionDefect.deleteMany({ where: { inspectionId: currentId } });
     if (defects.length > 0) {
       await prisma.inspectionDefect.createMany({
         data: defects.map((d: any) => ({
           inspectionId: currentId,
-          defectCode: d.defectCode,
+          defectCode: d.defectCode || '',
           description: d.description || '',
           location: d.location || '',
           severity: d.severity || 'Major',
@@ -212,12 +257,13 @@ export async function POST(req: Request) {
       });
     }
 
+    await prisma.inspectionPhoto.deleteMany({ where: { inspectionId: currentId } });
     if (photos.length > 0) {
       await prisma.inspectionPhoto.createMany({
         data: photos.map((p: any) => ({
           inspectionId: currentId,
           type: p.type || 'inspection',
-          photoUrl: p.photoUrl,
+          photoUrl: p.photoUrl || '',
           description: p.description || '',
         })),
       });

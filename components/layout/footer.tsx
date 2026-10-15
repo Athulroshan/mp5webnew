@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowUp, ShieldCheck, RefreshCw, Smartphone, Award } from "lucide-react";
+import { ArrowUp, ShieldCheck, RefreshCw, Award } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -39,28 +39,22 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Col 3: EXPERIENCE MPSS APP */}
+          {/* Col 3: KEEP IN TOUCH */}
           <div className="space-y-3">
-            <h4 className="text-slate-900 uppercase tracking-wider text-xs">EXPERIENCE MPSS APP ON MOBILE</h4>
-            <div className="flex flex-col gap-2 pt-1">
-              <div className="bg-slate-900 text-white p-2.5 rounded-lg flex items-center justify-center text-center cursor-pointer hover:bg-slate-800 w-36">
-                <div>
-                  <p className="text-[9px] text-slate-400 uppercase leading-none">GET IT ON</p>
-                  <p className="text-xs leading-tight mt-0.5">Google Play</p>
-                </div>
-              </div>
-
-              <div className="bg-slate-900 text-white p-2.5 rounded-lg flex items-center justify-center text-center cursor-pointer hover:bg-slate-800 w-36">
-                <div>
-                  <p className="text-[9px] text-slate-400 uppercase leading-none">Download on the</p>
-                  <p className="text-xs leading-tight mt-0.5">App Store</p>
-                </div>
-              </div>
+            <h4 className="text-slate-900 uppercase tracking-wider text-xs">KEEP IN TOUCH</h4>
+            <div className="flex flex-wrap gap-2 text-slate-600">
+              <span className="hover:text-slate-950 cursor-pointer">Facebook</span>
+              <span>•</span>
+              <span className="hover:text-slate-950 cursor-pointer">Twitter</span>
+              <span>•</span>
+              <span className="hover:text-slate-950 cursor-pointer">Instagram</span>
+              <span>•</span>
+              <span className="hover:text-slate-950 cursor-pointer">Youtube</span>
             </div>
 
-            <div className="pt-3">
-              <h5 className="text-slate-900 mb-1">KEEP IN TOUCH</h5>
-              <p className="text-slate-500">Facebook • Twitter • Instagram • Youtube</p>
+            <div className="pt-2 space-y-1">
+              <p className="text-slate-900 font-medium">Customer Support</p>
+              <p className="text-slate-500 text-[11px]">support@mpss.com</p>
             </div>
           </div>
 
