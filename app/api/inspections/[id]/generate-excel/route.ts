@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { generateInspectionExcelReport } from '@/lib/excel-generator';
 
-const prisma = new PrismaClient();
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

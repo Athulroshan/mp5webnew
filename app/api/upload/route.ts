@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
 import path from 'path';
+import { saveFile } from '@/lib/storage';
 
 export async function POST(req: Request) {
   try {
-    const contentType = req.headers.get('content-type') || '';
+    const contentTypeHeader = req.headers.get('content-type') || '';
 
     // Handle base64 JSON upload
-    if (contentType.includes('application/json')) {
+    if (contentTypeHeader.includes('application/json')) {
       const body = await req.json();
       const { image, filename } = body;
 
@@ -15,26 +15,23 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'No image data provided' }, { status: 400 });
       }
 
-      const matches = image.match(/^data:image\/([a-zA-Z]+);base64,(.+)$/);
+      const matches = image.match(/^data:image\/([a-zA-Z0-9.+-]+);base64,(.+)$/);
       if (!matches) {
         return NextResponse.json({ error: 'Invalid base64 image data' }, { status: 400 });
       }
 
-      const ext = matches[1].toLowerCase() === 'jpg' ? 'jpeg' : matches[1].toLowerCase();
+      const rawExt = matches[1].toLowerCase();
+      const ext = rawExt === 'jpg' ? 'jpeg' : rawExt;
       const buffer = Buffer.from(matches[2], 'base64');
-
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-
       const safeFilename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
-      const filePath = path.join(uploadsDir, safeFilename);
-      fs.writeFileSync(filePath, buffer);
+
+      const saved = await saveFile(`uploads/${safeFilename}`, buffer, {
+        contentType: `image/${ext}`,
+      });
 
       return NextResponse.json({
         success: true,
-        url: `/uploads/${safeFilename}`,
+        url: saved.url,
         filename: safeFilename,
       });
     }
@@ -50,20 +47,16 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
     const ext = path.extname(file.name) || '.jpg';
     const safeFilename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
-    const filePath = path.join(uploadsDir, safeFilename);
 
-    fs.writeFileSync(filePath, buffer);
+    const saved = await saveFile(`uploads/${safeFilename}`, buffer, {
+      contentType: file.type || 'image/jpeg',
+    });
 
     return NextResponse.json({
       success: true,
-      url: `/uploads/${safeFilename}`,
+      url: saved.url,
       filename: safeFilename,
     });
   } catch (error: any) {
