@@ -7,8 +7,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Shirt, ClipboardCheck, ChevronDown, ChevronUp, Search, Shield, FileCheck, CheckCircle, Send, Users, Award, Globe, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -219,10 +220,14 @@ export default function ServicesPage() {
                 Ensuring quality at every stage. Explore our visual story showcasing Initial Assessment, On-Site Factory Inspection, Excel Reporting, and Certification.
               </p>
             </div>
-            <Link href="/services/inspection-process" className="shrink-0">
-              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold px-7 py-6 rounded-xl shadow-lg hover:scale-[1.02] transition-all">
-                Explore Inspection Process <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+            <Link
+              href="/services/inspection-process"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "shrink-0 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold px-7 py-6 rounded-xl shadow-lg hover:scale-[1.02] transition-all inline-flex items-center justify-center"
+              )}
+            >
+              Explore Inspection Process <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </div>
         </div>

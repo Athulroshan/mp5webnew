@@ -11,8 +11,9 @@ import { usePathname } from "next/navigation";
 import { Search, ShoppingCart, Menu, User, ChevronRight, ChevronDown, Sparkles } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useUser } from "@/lib/user-context";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
@@ -148,31 +149,31 @@ export default function Header() {
 
           {/* Right Action Items */}
           <div className="hidden lg:flex items-center gap-2">
-            <Link href="/products">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                aria-label="Search"
-              >
-                <Search className="h-4.5 w-4.5" />
-              </Button>
+            <Link
+              href="/products"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                "h-10 w-10 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 inline-flex items-center justify-center"
+              )}
+              aria-label="Search"
+            >
+              <Search className="h-4.5 w-4.5" />
             </Link>
 
-            <Link href="/cart">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative h-10 w-10 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                aria-label="Cart"
-              >
-                <ShoppingCart className="h-4.5 w-4.5" />
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] font-black bg-violet-600 text-white border-2 border-white shadow-xs">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
+            <Link
+              href="/cart"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                "relative h-10 w-10 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 inline-flex items-center justify-center"
+              )}
+              aria-label="Cart"
+            >
+              <ShoppingCart className="h-4.5 w-4.5" />
+              {totalItems > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] font-black bg-violet-600 text-white border-2 border-white shadow-xs">
+                  {totalItems}
+                </Badge>
+              )}
             </Link>
 
             <div className="h-5 w-px bg-slate-200 mx-1" />
@@ -219,14 +220,15 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <Link href="/login">
-                <Button
-                  size="sm"
-                  className="bg-slate-900 hover:bg-violet-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-colors duration-200 flex items-center gap-1.5"
-                >
-                  <User className="h-3.5 w-3.5 text-violet-300" />
-                  <span>Sign In</span>
-                </Button>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  "bg-slate-900 hover:bg-violet-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs transition-colors duration-200 inline-flex items-center gap-1.5"
+                )}
+              >
+                <User className="h-3.5 w-3.5 text-violet-300" />
+                <span>Sign In</span>
               </Link>
             )}
           </div>

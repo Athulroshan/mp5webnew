@@ -33,6 +33,16 @@ import {
   Box,
   Percent,
 } from 'lucide-react';
+import { useUser } from '@/lib/user-context';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 export interface DefectItem {
   id: string | number;
@@ -248,6 +258,34 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
   const [inspectionNumber, setInspectionNumber] = useState<string>(
     initialData?.inspectionNumber || 'FI_MPSS_...'
   );
+
+  // Role permissions & Clear all dialog state
+  const { user } = useUser();
+  const [canWrite, setCanWrite] = useState<boolean>(true);
+  const [clearDialogOpen, setClearDialogOpen] = useState<boolean>(false);
+  const isClearedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user') || localStorage.getItem('user_profile');
+      const u = stored ? JSON.parse(stored) : user;
+      if (u) {
+        const role = (u.role || '').toLowerCase();
+        const hasPermission =
+          role === 'admin' ||
+          role === 'inspector' ||
+          role === 'garment quality auditor' ||
+          role.includes('admin') ||
+          role.includes('inspector') ||
+          role.includes('auditor');
+        setCanWrite(Boolean(hasPermission && u.approved !== false));
+      } else {
+        setCanWrite(false);
+      }
+    } catch {
+      setCanWrite(true);
+    }
+  }, [user]);
 
   // ---------------------------------------------------------------------------
   // TAB 1: AUDIT STATE (Matching Audit sheet top-to-bottom)
@@ -800,6 +838,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
 
   // Debounced Autosave (3.5 seconds after editing)
   useEffect(() => {
+    if (isClearedRef.current) return;
     const timer = setTimeout(() => {
       saveDraft();
     }, 3500);
@@ -812,6 +851,136 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     approvedBySignature, supplierRepSignature, overrideResult, inspectionBoxes,
     defectBoxes, packingListPhotos, measurePhotos, saveDraft
   ]);
+
+  const handleManualSave = () => {
+    isClearedRef.current = false;
+    saveDraft();
+  };
+
+  const handleClearAll = () => {
+    isClearedRef.current = true;
+    setClearDialogOpen(false);
+    setValidationError('');
+
+    // Tab 1: Audit
+    setProductDescription('');
+    setInspectionDate(new Date().toISOString().split('T')[0]);
+    setInspectionTeam('');
+    setCustomer('');
+    setAccount('');
+    setMerchandiser('');
+    setFactoryName('');
+    setFactoryLocation('');
+    setCountryOfOrigin('');
+    setStyleNumber('');
+    setPoNumber('');
+    setPoQuantity(0);
+    setSeason('');
+    setColorWays('');
+    setSize('');
+    setShipmentDate('');
+    setInspectorName('');
+
+    // Type Matrix & Shipping
+    setSampleType('');
+    setInspectionType('');
+    setOrderType('');
+    setShipBy('Sea');
+    setTotalCartons(0);
+    setQtyShipped(0);
+    setQtyAvailable(0);
+
+    // AQL Settings
+    setInspectionLevel('II');
+    setInspectedQty(0);
+    setCriticalAccept('0');
+    setMajorAccept('');
+    setMinorAccept('');
+
+    // Items to Check
+    setItemsToCheck(
+      MASTER_22_CHECKPOINTS.map((text, i) => ({
+        id: i + 1,
+        question: text,
+        status: 'N/A',
+        comment: '',
+      }))
+    );
+
+    // Defects
+    setDefects([]);
+
+    // Production Status
+    setCuttingPercent('');
+    setSewingPercent('');
+    setTrimmingPercent('');
+    setPackedPercent('');
+    setTotalCartonQty('');
+    setCartonsPacked('');
+
+    // Comments & findings
+    setComments('');
+    setOthersComment('');
+    setSelectedCartons('');
+
+    // Measurement Summary
+    setMeasurementResult('N/A');
+    setMeasurementSampleSize('');
+    setMaxAllowedPoints('');
+    setTotalPomPoints('');
+    setDefectivePointsFound('');
+    setSampleSizeCriteria('');
+    setMeasurementComment('');
+
+    // Signatures
+    setMpssQcName('');
+    setMpssQcSignature('');
+    setApprovedByName('');
+    setApprovedBySignature('');
+    setSupplierRepName('');
+    setSupplierRepSignature('');
+
+    // Result override
+    setOverrideResult('');
+
+    // Tab 2: Packing List
+    setPackingListDate('');
+    setPackingListStyle('');
+    setPackingListOrderQty('');
+    setPackingListFactory('');
+    setPackingListPo('');
+    setPackingListCutQty('');
+    setPackingListLocation('');
+    setPackingListColours('');
+    setPackingListShipQty('');
+    setPackingListPhotos([]);
+
+    // Tab 3: Measure
+    setMeasureFactory('');
+    setMeasureVpnStyle('');
+    setMeasurePo('');
+    setMeasureStyleDesc('');
+    setMeasureAuditDate('');
+    setMeasurePhotos([]);
+
+    // Tab 4: Inspection Photos
+    setInspectionBoxes(
+      Array.from({ length: 12 }, (_, i) => ({
+        id: i + 1,
+        photoUrl: '',
+        name: String(i + 1),
+      }))
+    );
+
+    // Tab 5: Defect Photos
+    setDefectBoxes(
+      Array.from({ length: 8 }, (_, i) => ({
+        id: i + 1,
+        photoUrl: '',
+        name: `Defect ${i + 1}`,
+      }))
+    );
+  };
 
   // ---------------------------------------------------------------------------
   // DEFECT CLASSIFICATION TABLE HANDLERS
@@ -1085,36 +1254,56 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 self-end sm:self-auto">
+          <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-auto flex-wrap">
             {/* Live Save Status */}
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mr-2">
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mr-1">
               {saving ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-500" />
-                  <span>Saving…</span>
+                  <span className="hidden sm:inline">Saving…</span>
                 </>
               ) : (
                 <>
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>{lastSavedTime ? `Saved at ${lastSavedTime}` : 'Draft ready'}</span>
+                  <span className="hidden sm:inline">{lastSavedTime ? `Saved at ${lastSavedTime}` : 'Draft ready'}</span>
                 </>
               )}
             </div>
 
+            {canWrite && (
+              <button
+                type="button"
+                onClick={() => setClearDialogOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+                title="Clear all fields in this report"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Clear all</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={() => saveDraft()}
-              disabled={saving}
-              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl transition"
+              onClick={() => router.push('/inspections')}
+              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl transition cursor-pointer"
             >
-              Save Now
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              onClick={handleManualSave}
+              disabled={saving}
+              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl transition cursor-pointer"
+            >
+              Save
             </button>
 
             <button
               type="button"
               onClick={handleGenerateReport}
               disabled={generating}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition active:scale-95"
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition active:scale-95 cursor-pointer"
             >
               {generating ? (
                 <>
@@ -2846,7 +3035,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
         )}
 
         {/* ── BOTTOM PREVIOUS / NEXT BAR ─────────────────────────────────────── */}
-        <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex-wrap gap-3">
           <button
             type="button"
             disabled={activeTab === 1}
@@ -2865,36 +3054,99 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
             Tab {activeTab} of 5
           </span>
 
-          {activeTab < 5 ? (
+          <div className="flex items-center gap-2 flex-wrap">
+            {canWrite && (
+              <button
+                type="button"
+                onClick={() => setClearDialogOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer"
+                title="Clear all fields in this report"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Clear all</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={() => setActiveTab((p) => Math.min(5, p + 1))}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-500/20"
+              onClick={() => router.push('/inspections')}
+              className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer"
             >
-              <span>Next</span>
-              <ChevronRight className="w-4 h-4" />
+              Cancel
             </button>
-          ) : (
+
             <button
               type="button"
-              onClick={handleGenerateReport}
-              disabled={generating}
-              className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-emerald-500/20"
+              onClick={handleManualSave}
+              disabled={saving}
+              className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer"
             >
-              {generating ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Generating…</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Preview & Finalize</span>
-                </>
-              )}
+              Save
             </button>
-          )}
+
+            {activeTab < 5 ? (
+              <button
+                type="button"
+                onClick={() => setActiveTab((p) => Math.min(5, p + 1))}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-500/20 cursor-pointer"
+              >
+                <span>Next</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleGenerateReport}
+                disabled={generating}
+                className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-emerald-500/20 cursor-pointer"
+              >
+                {generating ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Generating…</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Preview & Finalize</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* ── CONFIRMATION DIALOG: CLEAR ALL ─────────────────────────────────── */}
+        <Dialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+          <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                Clear all?
+              </DialogTitle>
+              <DialogDescription className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+                Would you like to clear everything written in this report?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setClearDialogOpen(false)}
+                className="px-4 py-2 text-xs font-bold rounded-xl"
+              >
+                No
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleClearAll}
+                className="px-4 py-2 text-xs font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-xs"
+              >
+                Yes
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

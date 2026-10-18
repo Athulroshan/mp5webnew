@@ -8,9 +8,10 @@ import React from "react";
 import Link from "next/link";
 import { Trash2, ArrowLeft, ArrowRight, ShoppingBag } from "lucide-react";
 import { useCart, formatINR } from "@/lib/cart-context";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, totalPrice, totalItems } = useCart();
@@ -27,10 +28,14 @@ export default function CartPage() {
         </div>
         <h1 className="text-2xl font-light text-slate-900 mb-2">Your cart is empty</h1>
         <p className="text-sm text-slate-500 font-light mb-6">Looks like you haven't added any products to your cart yet.</p>
-        <Link href="/products">
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white font-normal px-6">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Continue Shopping
-          </Button>
+        <Link
+          href="/products"
+          className={cn(
+            buttonVariants(),
+            "bg-slate-900 hover:bg-slate-800 text-white font-normal px-6 inline-flex items-center"
+          )}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" /> Continue Shopping
         </Link>
       </div>
     );
@@ -142,10 +147,14 @@ export default function CartPage() {
                 </div>
               </CardContent>
               <CardFooter className="pt-2">
-                <Link href="/checkout" className="w-full">
-                  <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-normal py-5">
-                    Proceed to Checkout <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
+                <Link
+                  href="/checkout"
+                  className={cn(
+                    buttonVariants(),
+                    "w-full bg-slate-900 hover:bg-slate-800 text-white font-normal py-5 flex items-center justify-center"
+                  )}
+                >
+                  Proceed to Checkout <ArrowRight className="h-4 w-4 ml-2" />
                 </Link>
               </CardFooter>
             </Card>

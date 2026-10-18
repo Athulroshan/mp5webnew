@@ -9,8 +9,9 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RotateCcw } from "lucide-react";
 import { useCart, formatINR } from "@/lib/cart-context";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -112,8 +113,14 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
         <p className="text-gray-500 font-light text-lg mb-4">Product not found</p>
-        <Link href="/products">
-          <Button variant="outline" className="font-light"><ArrowLeft className="h-4 w-4 mr-2" /> Back to Products</Button>
+        <Link
+          href="/products"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "font-light inline-flex items-center"
+          )}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Products
         </Link>
       </div>
     );

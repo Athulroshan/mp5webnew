@@ -8,9 +8,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, ShieldCheck, Lock, CreditCard } from "lucide-react";
 import { useCart, formatINR } from "@/lib/cart-context";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
@@ -146,16 +147,24 @@ export default function CheckoutPage() {
           </div>
 
           <div className="space-y-3">
-            <Link href={`/track-order?orderId=${orderDetails.orderNumber}`}>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-normal shadow-sm">
-                🚚 Track Live Delivery Status
-              </Button>
+            <Link
+              href={`/track-order?orderId=${orderDetails.orderNumber}`}
+              className={cn(
+                buttonVariants(),
+                "w-full bg-emerald-600 hover:bg-emerald-700 text-white font-normal shadow-sm flex items-center justify-center"
+              )}
+            >
+              🚚 Track Live Delivery Status
             </Link>
 
-            <Link href="/products">
-              <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:bg-slate-50 font-normal">
-                Return to Store
-              </Button>
+            <Link
+              href="/products"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full border-slate-300 text-slate-700 hover:bg-slate-50 font-normal flex items-center justify-center"
+              )}
+            >
+              Return to Store
             </Link>
           </div>
         </Card>
@@ -167,10 +176,14 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-[70vh] bg-slate-50 flex flex-col items-center justify-center p-4">
         <p className="text-lg font-light text-slate-600 mb-4">Your cart is empty. Add items before checking out.</p>
-        <Link href="/products">
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white font-normal">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Products
-          </Button>
+        <Link
+          href="/products"
+          className={cn(
+            buttonVariants(),
+            "bg-slate-900 hover:bg-slate-800 text-white font-normal inline-flex items-center"
+          )}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Products
         </Link>
       </div>
     );

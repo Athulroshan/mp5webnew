@@ -30,9 +30,10 @@ import {
 } from "lucide-react";
 import { useCart, formatINR } from "@/lib/cart-context";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -185,42 +186,81 @@ function ProductCard({
   if (viewMode === "list") {
     return (
       <Card className="flex flex-col sm:flex-row overflow-hidden group hover:shadow-lg transition-all duration-300 border-gray-200">
-        <Link href={`/products/${product.id}`} className="w-full sm:w-52 shrink-0 relative overflow-hidden bg-gray-100 aspect-[4/3] sm:aspect-square">
-          <img src={imgUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <div className="w-full sm:w-52 shrink-0 relative overflow-hidden bg-gray-100 aspect-[4/3] sm:aspect-square">
+          <img
+            src={imgUrl}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <Link
+            href={`/products/${product.id}`}
+            className="absolute inset-0 z-0"
+            aria-label={product.name}
+          />
           {product.badge && (
-            <Badge className="absolute top-2 left-2 text-xs bg-violet-600 text-white border-0">{product.badge}</Badge>
+            <Badge className="absolute top-2 left-2 z-10 pointer-events-none text-xs bg-violet-600 text-white border-0">
+              {product.badge}
+            </Badge>
           )}
-        </Link>
+          {discount > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute top-2 right-2 z-10 pointer-events-none text-xs font-bold"
+            >
+              -{discount}%
+            </Badge>
+          )}
+        </div>
         <div className="flex-1 flex flex-col p-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <div>
-              <p className="text-xs text-violet-600 font-semibold uppercase tracking-wider mb-1">{product.category}</p>
+              <p className="text-xs text-violet-600 font-semibold uppercase tracking-wider mb-1">
+                {product.category}
+              </p>
               <Link href={`/products/${product.id}`}>
-                <h3 className="text-lg font-bold text-gray-900 hover:text-violet-600 transition-colors">{product.name}</h3>
+                <h3 className="text-lg font-bold text-gray-900 hover:text-violet-600 transition-colors">
+                  {product.name}
+                </h3>
               </Link>
             </div>
             <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-xs font-semibold">
               <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
-              <span>{product.ratingsAverage} ({product.ratingsCount})</span>
+              <span>
+                {product.ratingsAverage} ({product.ratingsCount})
+              </span>
             </div>
           </div>
 
-          <p className="text-sm text-gray-600 font-normal mb-4 line-clamp-2">{product.description}</p>
+          <p className="text-sm text-gray-600 font-normal mb-4 line-clamp-2">
+            {product.description}
+          </p>
 
           <div className="flex flex-wrap items-center justify-between gap-3 mt-auto pt-3 border-t border-gray-100">
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-extrabold text-gray-900">{formatINR(product.price)}</span>
+              <span className="text-xl font-extrabold text-gray-900">
+                {formatINR(product.price)}
+              </span>
               {product.originalPrice && (
-                <span className="text-sm text-gray-400 line-through font-normal">{formatINR(product.originalPrice)}</span>
+                <span className="text-sm text-gray-400 line-through font-normal">
+                  {formatINR(product.originalPrice)}
+                </span>
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Link href="/customization">
-                <Button size="sm" variant="outline" className="text-violet-700 border-violet-200 hover:bg-violet-50 text-xs font-semibold">
-                  <Sparkles className="h-3.5 w-3.5 mr-1 text-violet-600" /> Customize 3D
-                </Button>
+              <Link
+                href="/customization"
+                className={cn(
+                  buttonVariants({ size: "sm", variant: "outline" }),
+                  "text-violet-700 border-violet-200 hover:bg-violet-50 text-xs font-semibold inline-flex items-center"
+                )}
+              >
+                <Sparkles className="h-3.5 w-3.5 mr-1 text-violet-600" /> Customize 3D
               </Link>
-              <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold" onClick={() => onAddToCart(product)}>
+              <Button
+                size="sm"
+                className="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold"
+                onClick={() => onAddToCart(product)}
+              >
                 <ShoppingCart className="h-3.5 w-3.5 mr-1" /> Add to Cart
               </Button>
             </div>
@@ -232,30 +272,62 @@ function ProductCard({
 
   return (
     <Card className="overflow-hidden group hover:shadow-xl transition-all duration-300 border-gray-200 flex flex-col">
-      <Link href={`/products/${product.id}`} className="relative block aspect-[4/5] overflow-hidden bg-gray-100">
-        <img src={imgUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className="relative block aspect-[4/5] overflow-hidden bg-gray-100">
+        <img
+          src={imgUrl}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+
+        {/* Product link layer */}
+        <Link
+          href={`/products/${product.id}`}
+          className="absolute inset-0 z-0"
+          aria-label={product.name}
+        />
+
+        {/* Badges as siblings with z-10 and pointer-events-none */}
         {product.badge && (
-          <Badge className="absolute top-3 left-3 text-xs bg-violet-600 text-white font-semibold border-0 shadow-sm">{product.badge}</Badge>
+          <Badge className="absolute top-3 left-3 z-10 pointer-events-none text-xs bg-violet-600 text-white font-semibold border-0 shadow-sm">
+            {product.badge}
+          </Badge>
         )}
         {discount > 0 && (
-          <Badge variant="destructive" className="absolute top-3 right-3 text-xs font-bold">-{discount}%</Badge>
+          <Badge
+            variant="destructive"
+            className="absolute top-3 right-3 z-10 pointer-events-none text-xs font-bold"
+          >
+            -{discount}%
+          </Badge>
         )}
-        {/* Hover action bar */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
-          <Button size="sm" className="flex-1 bg-white hover:bg-gray-100 text-slate-900 font-semibold text-xs shadow-md" onClick={(e) => { e.preventDefault(); onAddToCart(product); }}>
+
+        {/* Hover action bar as sibling with z-10 */}
+        <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
+          <Button
+            size="sm"
+            className="flex-1 bg-white hover:bg-gray-100 text-slate-900 font-semibold text-xs shadow-md"
+            onClick={() => onAddToCart(product)}
+          >
             <ShoppingCart className="h-3.5 w-3.5 mr-1 text-violet-600" /> Add to Cart
           </Button>
-          <Link href="/customization" className="inline-block" onClick={(e) => e.stopPropagation()}>
-            <Button size="sm" variant="secondary" className="bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs shadow-md" title="Customize in 3D Studio">
-              <Sparkles className="h-3.5 w-3.5" />
-            </Button>
+          <Link
+            href="/customization"
+            className={cn(
+              buttonVariants({ size: "sm", variant: "secondary" }),
+              "bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs shadow-md inline-flex items-center justify-center"
+            )}
+            title="Customize in 3D Studio"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
           </Link>
         </div>
-      </Link>
+      </div>
 
       <CardContent className="p-4 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[11px] font-bold text-violet-600 uppercase tracking-wider">{product.category}</span>
+          <span className="text-[11px] font-bold text-violet-600 uppercase tracking-wider">
+            {product.category}
+          </span>
           <div className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
             <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
             <span>{product.ratingsAverage}</span>
@@ -263,7 +335,9 @@ function ProductCard({
         </div>
 
         <Link href={`/products/${product.id}`}>
-          <h3 className="text-sm font-bold text-gray-900 mb-2 hover:text-violet-600 transition-colors line-clamp-1">{product.name}</h3>
+          <h3 className="text-sm font-bold text-gray-900 mb-2 hover:text-violet-600 transition-colors line-clamp-1">
+            {product.name}
+          </h3>
         </Link>
         <p className="text-xs text-gray-500 line-clamp-2 mb-3">{product.description}</p>
       </CardContent>
@@ -272,10 +346,15 @@ function ProductCard({
         <div className="flex items-baseline gap-1.5">
           <span className="text-lg font-bold text-gray-900">{formatINR(product.price)}</span>
           {product.originalPrice && (
-            <span className="text-xs text-gray-400 line-through font-normal">{formatINR(product.originalPrice)}</span>
+            <span className="text-xs text-gray-400 line-through font-normal">
+              {formatINR(product.originalPrice)}
+            </span>
           )}
         </div>
-        <Link href="/customization" className="text-xs text-violet-600 hover:text-violet-800 font-semibold flex items-center gap-0.5">
+        <Link
+          href="/customization"
+          className="text-xs text-violet-600 hover:text-violet-800 font-semibold flex items-center gap-0.5"
+        >
           3D Studio <ArrowRight className="h-3 w-3" />
         </Link>
       </CardFooter>
@@ -485,10 +564,14 @@ function ProductsPageInner() {
               <p className="text-xs text-indigo-100 mb-4 leading-relaxed">
                 Design custom logos, prints, and colors directly on 3D T-shirt models in real-time.
               </p>
-              <Link href="/customization">
-                <Button size="sm" className="w-full bg-white hover:bg-gray-100 text-violet-900 font-bold text-xs">
-                  Launch 3D Studio
-                </Button>
+              <Link
+                href="/customization"
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  "w-full bg-white hover:bg-gray-100 text-violet-900 font-bold text-xs inline-flex items-center justify-center"
+                )}
+              >
+                Launch 3D Studio
               </Link>
             </div>
           </aside>
@@ -571,10 +654,14 @@ function ProductsPageInner() {
                 From your idea to the finished product. Explore our 5-stage editorial story showcasing Design, Sampling, Bulk Production, Finishing, and Global Delivery.
               </p>
             </div>
-            <Link href="/products/manufacturing-process" className="shrink-0">
-              <Button size="lg" className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold px-7 py-6 rounded-xl shadow-lg hover:scale-[1.02] transition-all">
-                Explore Manufacturing Process <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+            <Link
+              href="/products/manufacturing-process"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "shrink-0 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold px-7 py-6 rounded-xl shadow-lg hover:scale-[1.02] transition-all inline-flex items-center justify-center"
+              )}
+            >
+              Explore Manufacturing Process <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </div>
         </section>
