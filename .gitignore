@@ -40,4 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# sqlite and local backups
+*.db
+*.db-journal
+*.db.bak
+prisma/dev.db*
+prisma/sqlite_backup_data.json
