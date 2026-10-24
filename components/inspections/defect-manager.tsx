@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, AlertCircle, Camera, ShieldAlert } from 'lucide-react';
 import { PhotoUploader } from './photo-uploader';
+import { getSafeInspectionImageUrl } from '@/lib/image-utils';
 
 export interface DefectItem {
   defectCode: string;
@@ -203,7 +204,14 @@ export function DefectManager({ defects, onChange, onPhotoAdd }: DefectManagerPr
             >
               <div className="flex items-center gap-3 min-w-0">
                 {def.photoUrl ? (
-                  <img src={def.photoUrl} alt="Defect" className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0" />
+                  <img
+                    src={getSafeInspectionImageUrl(def.photoUrl)}
+                    alt="Defect"
+                    className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLElement).style.opacity = '0.3';
+                    }}
+                  />
                 ) : (
                   <div className="w-12 h-12 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 flex items-center justify-center shrink-0">
                     <ShieldAlert className="w-6 h-6" />

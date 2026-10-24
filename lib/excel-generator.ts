@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import path from 'path';
-import { AUDIT_SHEET_MAPPING, getPhotoBuffer, walkAndWritePhotoBlocks } from './excel-mapper';
+import { AUDIT_SHEET_MAPPING, getPhotoBuffer, getPhotoBufferAsync, walkAndWritePhotoBlocks } from './excel-mapper';
 import { convertExcelToPdf } from './pdf-converter';
 
 export interface InspectionMeasurementData {
@@ -64,12 +64,15 @@ export interface FullInspectionPayload {
   currentVersion?: number;
 }
 
-import { saveFile } from './storage';
-
 export async function generateInspectionExcelReport(
   payload: FullInspectionPayload
 ): Promise<{ filePath: string; relativeUrl: string; filename: string; pdfPath?: string; relativePdfUrl?: string }> {
-  // Master Template MUST NEVER BE MUTATED DIRECTLY - Read template in-memory
+  const reportsDir = path.join(process.cwd(), 'public', 'reports');
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
+  }
+
+  // Master Template MUST NEVER BE MUTATED DIRECTLY - Copy FRESH for every report generation
   const masterTemplatePath = path.join(process.cwd(), 'templates', 'MPSS BLANK REPORT.xlsx');
   if (!fs.existsSync(masterTemplatePath)) {
     throw new Error(`Master template missing at ${masterTemplatePath}`);
@@ -78,10 +81,14 @@ export async function generateInspectionExcelReport(
   const safePO = (payload.poNumber || 'UNKNOWN').replace(/[^a-zA-Z0-9_-]/g, '');
   const vNum = payload.currentVersion || 1;
   const filename = `MPSS_${payload.inspectionNumber}_${safePO}_V${vNum}.xlsx`;
+  const freshCopyFilePath = path.join(reportsDir, filename);
 
-  // Open master template directly in-memory with ExcelJS
+  // Copy ORIGINAL template fresh to target output path
+  fs.copyFileSync(masterTemplatePath, freshCopyFilePath);
+
+  // Open fresh copy with ExcelJS
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(masterTemplatePath);
+  await workbook.xlsx.readFile(freshCopyFilePath);
 
   // -------------------------------------------------------------
   // 1. POPULATE AUDIT SHEET USING CELL MAPPING ENGINE
@@ -201,7 +208,7 @@ export async function generateInspectionExcelReport(
 
     const measurePhotoData = payload.photos ? payload.photos.find((p) => p.type === 'measurement') : undefined;
     if (measurePhotoData) {
-      const imgInfo = await getPhotoBuffer(measurePhotoData.photoUrl);
+      const imgInfo = await getPhotoBufferAsync(measurePhotoData.photoUrl);
       if (imgInfo) {
         const imageId = workbook.addImage({
           buffer: imgInfo.buffer as any,
@@ -232,17 +239,24 @@ export async function generateInspectionExcelReport(
     await walkAndWritePhotoBlocks(workbook, 'Inspection photos', genInspectionPhotos);
   }
 
-  // Generate Excel workbook buffer in-memory
-  const excelBuffer = Buffer.from(await workbook.xlsx.writeBuffer());
+  // Save generated Excel workbook
+  await workbook.xlsx.writeFile(freshCopyFilePath);
 
-  // Save generated Excel workbook to persistent storage
-  const savedReport = await saveFile(`reports/${filename}`, excelBuffer, {
-    contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
+  // -------------------------------------------------------------
+  // 5. PIPELINE STEP: RECALCULATE FORMULAS & CONVERT TO PDF FOR PREVIEW
+  // -------------------------------------------------------------
+  let pdfRes: { pdfPath: string; relativePdfUrl: string } | null = null;
+  try {
+    pdfRes = await convertExcelToPdf(freshCopyFilePath);
+  } catch (pdfErr) {
+    console.warn('[GENERATION PIPELINE] PDF conversion skipped or encountered non-fatal warning:', pdfErr);
+  }
 
   return {
-    filePath: savedReport.pathname,
-    relativeUrl: savedReport.url,
+    filePath: freshCopyFilePath,
+    relativeUrl: `/reports/${filename}`,
     filename,
+    pdfPath: pdfRes?.pdfPath,
+    relativePdfUrl: pdfRes?.relativePdfUrl,
   };
 }

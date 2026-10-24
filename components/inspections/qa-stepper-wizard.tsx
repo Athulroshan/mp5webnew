@@ -43,6 +43,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { getSafeInspectionImageUrl } from '@/lib/image-utils';
 
 export interface DefectItem {
   id: string | number;
@@ -2462,9 +2463,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     >
                       <div className="aspect-4/3 w-full bg-slate-200 dark:bg-slate-900 rounded-xl overflow-hidden relative group">
                         <img
-                          src={photoUrl}
+                          src={getSafeInspectionImageUrl(photoUrl)}
                           alt={`Packing document ${idx + 1}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.opacity = '0.3';
+                          }}
                         />
                         {/* Overlay actions */}
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -2691,9 +2695,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     >
                       <div className="aspect-4/3 w-full bg-slate-200 dark:bg-slate-900 rounded-xl overflow-hidden relative group">
                         <img
-                          src={photoUrl}
+                          src={getSafeInspectionImageUrl(photoUrl)}
                           alt={`Measurement chart ${idx + 1}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.opacity = '0.3';
+                          }}
                         />
                         {/* Overlay actions */}
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -2785,9 +2792,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     {box.photoUrl ? (
                       <>
                         <img
-                          src={box.photoUrl}
+                          src={getSafeInspectionImageUrl(box.photoUrl)}
                           alt={box.name || `Box ${box.id}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.opacity = '0.3';
+                          }}
                         />
                         {/* Overlay Controls */}
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -2928,9 +2938,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     {box.photoUrl ? (
                       <>
                         <img
-                          src={box.photoUrl}
+                          src={getSafeInspectionImageUrl(box.photoUrl)}
                           alt={box.name || `Defect ${box.id}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.opacity = '0.3';
+                          }}
                         />
                         {/* Overlay Controls */}
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">

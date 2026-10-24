@@ -1,9 +1,18 @@
 import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
-import util from 'util';
 
-const execPromise = util.promisify(exec);
+function execPromise(command: string, options?: any): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    exec(command, options, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve({ stdout: String(stdout || ''), stderr: String(stderr || '') });
+      }
+    });
+  });
+}
 
 export async function convertExcelToPdf(excelFilePath: string): Promise<{ pdfPath: string; relativePdfUrl: string }> {
   const absExcelPath = path.isAbsolute(excelFilePath)

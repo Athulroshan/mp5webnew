@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileSpreadsheet, FileText, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { FileSpreadsheet, FileText, CheckCircle2, AlertCircle, RefreshCw, ImageOff } from 'lucide-react';
+import { getSafeInspectionImageUrl } from '@/lib/image-utils';
 
 interface DocumentViewerProps {
   inspection: any;
@@ -268,10 +269,17 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
                 </div>
               </div>
 
-              {measurementPhoto && (
+              {measurementPhoto && measurementPhoto.photoUrl && (
                 <div className="border border-slate-300 p-3 rounded space-y-1 bg-slate-50">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Physical Measurement Chart Photo</span>
-                  <img src={measurementPhoto.photoUrl} alt="Measurement Chart" className="max-h-64 rounded border object-contain mx-auto" />
+                  <img
+                    src={getSafeInspectionImageUrl(measurementPhoto.photoUrl)}
+                    alt="Measurement Chart"
+                    className="max-h-64 rounded border object-contain mx-auto"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLElement).style.display = 'none';
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -291,14 +299,38 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4">
-                  {inspectionPhotos.map((p: any, idx: number) => (
-                    <div key={idx} className="border border-slate-300 p-2 rounded bg-slate-50 space-y-1.5">
-                      <img src={p.photoUrl} alt={p.description || `Photo ${idx + 1}`} className="w-full h-44 object-cover rounded border" />
-                      <p className="text-[10px] font-semibold text-slate-700 italic truncate">
-                        #{idx + 1} — {p.description || 'Inspection detail photo'}
-                      </p>
-                    </div>
-                  ))}
+                  {inspectionPhotos.map((p: any, idx: number) => {
+                    const safeSrc = getSafeInspectionImageUrl(p.photoUrl);
+                    return (
+                      <div key={idx} className="border border-slate-300 p-2 rounded bg-slate-50 space-y-1.5">
+                        {safeSrc ? (
+                          <img
+                            src={safeSrc}
+                            alt={p.description || `Photo ${idx + 1}`}
+                            className="w-full h-44 object-cover rounded border"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent && !parent.querySelector('.photo-fallback')) {
+                                const placeholder = document.createElement('div');
+                                placeholder.className = 'photo-fallback w-full h-44 flex flex-col items-center justify-center bg-slate-200 text-slate-400 text-xs rounded border border-dashed';
+                                placeholder.innerHTML = '<span>Photo unavailable</span>';
+                                parent.insertBefore(placeholder, target);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-44 flex items-center justify-center bg-slate-200 text-slate-400 text-xs rounded border border-dashed">
+                            No photo
+                          </div>
+                        )}
+                        <p className="text-[10px] font-semibold text-slate-700 italic truncate">
+                          #{idx + 1} — {p.description || 'Inspection detail photo'}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -343,14 +375,30 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
                 <div className="space-y-2">
                   <h3 className="text-[11px] font-bold text-slate-700 uppercase">Defect Photo Evidences</h3>
                   <div className="grid grid-cols-2 gap-3">
-                    {defectPhotos.map((dp: any, idx: number) => (
-                      <div key={idx} className="border border-slate-300 p-2 rounded bg-slate-50 space-y-1">
-                        <img src={dp.photoUrl} alt="Defect Detail" className="w-full h-36 object-cover rounded border" />
-                        <p className="text-[9px] font-bold text-red-800 truncate">
-                          {dp.defectCode ? `[${dp.defectCode}] ` : ''}{dp.description || 'Defect detail'}
-                        </p>
-                      </div>
-                    ))}
+                    {defectPhotos.map((dp: any, idx: number) => {
+                      const safeSrc = getSafeInspectionImageUrl(dp.photoUrl);
+                      return (
+                        <div key={idx} className="border border-slate-300 p-2 rounded bg-slate-50 space-y-1">
+                          {safeSrc ? (
+                            <img
+                              src={safeSrc}
+                              alt="Defect Detail"
+                              className="w-full h-36 object-cover rounded border"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-36 flex items-center justify-center bg-slate-200 text-slate-400 text-xs rounded border border-dashed">
+                              No photo
+                            </div>
+                          )}
+                          <p className="text-[9px] font-bold text-red-800 truncate">
+                            {dp.defectCode ? `[${dp.defectCode}] ` : ''}{dp.description || 'Defect detail'}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

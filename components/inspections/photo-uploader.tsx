@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, Trash2, Image as ImageIcon, Plus, Check } from 'lucide-react';
+import { getSafeInspectionImageUrl } from '@/lib/image-utils';
 
 interface PhotoItem {
   id?: string;
@@ -165,9 +166,12 @@ export function PhotoUploader({
               {/* Thumbnail */}
               <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700">
                 <img
-                  src={photo.photoUrl}
+                  src={getSafeInspectionImageUrl(photo.photoUrl)}
                   alt={`Photo ${idx + 1}`}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.opacity = '0.3';
+                  }}
                 />
               </div>
 

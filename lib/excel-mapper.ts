@@ -1,7 +1,6 @@
 import ExcelJS from 'exceljs';
 import fs from 'fs';
 import path from 'path';
-import { getFileStream } from './storage';
 
 // JSON Mapping Configuration Schema per Sheet
 export interface SheetMappingConfig {
@@ -63,11 +62,11 @@ export const MEASURE_SHEET_MAPPING: SheetMappingConfig = {
 };
 
 // Function to resolve photo buffer from URL or Base64 data string
-export async function getPhotoBuffer(photoUrl: string): Promise<{ buffer: Buffer; extension: 'jpeg' | 'png' | 'gif' } | null> {
+export function getPhotoBuffer(photoUrl: string): { buffer: Buffer; extension: 'jpeg' | 'png' | 'gif' } | null {
   if (!photoUrl) return null;
   try {
     if (photoUrl.startsWith('data:image/')) {
-      const matches = photoUrl.match(/^data:image\/([a-zA-Z0-9.+-]+);base64,(.+)$/);
+      const matches = photoUrl.match(/^data:image\/([a-zA-Z]+);base64,(.+)$/);
       if (matches) {
         const rawExt = matches[1].toLowerCase();
         const ext = rawExt === 'jpg' ? 'jpeg' : rawExt;
@@ -77,40 +76,55 @@ export async function getPhotoBuffer(photoUrl: string): Promise<{ buffer: Buffer
         };
       }
     }
-
-    // Resolve target URL (extract blob URL if it was wrapped in /api/files proxy)
-    let cleanTarget = photoUrl;
-    if (photoUrl.startsWith('/api/files?url=')) {
-      cleanTarget = decodeURIComponent(photoUrl.replace('/api/files?url=', '').split('&')[0]);
+    let relativePath = photoUrl.startsWith('/') ? photoUrl.slice(1) : photoUrl;
+    const fullPath = path.join(process.cwd(), 'public', relativePath);
+    if (fs.existsSync(fullPath)) {
+      const extName = path.extname(fullPath).toLowerCase().replace('.', '');
+      const ext = extName === 'jpg' ? 'jpeg' : extName;
+      return {
+        buffer: fs.readFileSync(fullPath),
+        extension: ['jpeg', 'png', 'gif'].includes(ext) ? (ext as any) : 'jpeg',
+      };
     }
-
-    const { stream, contentType } = await getFileStream(cleanTarget);
-    let buf: Buffer;
-
-    if (Buffer.isBuffer(stream)) {
-      buf = stream;
-    } else {
-      const chunks: Uint8Array[] = [];
-      const reader = (stream as ReadableStream<Uint8Array>).getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) chunks.push(value);
-      }
-      buf = Buffer.concat(chunks);
-    }
-
-    let ext: 'jpeg' | 'png' | 'gif' = 'jpeg';
-    if (contentType.includes('png')) ext = 'png';
-    else if (contentType.includes('gif')) ext = 'gif';
-
-    return {
-      buffer: buf,
-      extension: ext,
-    };
   } catch (e) {
     console.warn(`[PHOTO LOADER WARNING] Could not read photo from ${photoUrl}:`, e);
   }
+  return null;
+}
+
+/**
+ * Asynchronously fetch image buffer from remote public blob or local path.
+ */
+export async function getPhotoBufferAsync(photoUrl: string): Promise<{ buffer: Buffer; extension: 'jpeg' | 'png' | 'gif' } | null> {
+  if (!photoUrl) return null;
+
+  // 1. Check sync resolution (base64 or local file)
+  const localRes = getPhotoBuffer(photoUrl);
+  if (localRes) return localRes;
+
+  // 2. Fetch remote public blob or proxied URL
+  try {
+    let fetchUrl = photoUrl;
+    if (photoUrl.startsWith('/api/files?url=')) {
+      const match = photoUrl.match(/url=([^&]+)/);
+      if (match) fetchUrl = decodeURIComponent(match[1]);
+    }
+
+    if (fetchUrl.startsWith('http://') || fetchUrl.startsWith('https://')) {
+      const res = await fetch(fetchUrl);
+      if (res.ok) {
+        const arrayBuf = await res.arrayBuffer();
+        const contentType = (res.headers.get('content-type') || '').toLowerCase();
+        let extension: 'jpeg' | 'png' | 'gif' = 'jpeg';
+        if (contentType.includes('png')) extension = 'png';
+        else if (contentType.includes('gif')) extension = 'gif';
+        return { buffer: Buffer.from(arrayBuf), extension };
+      }
+    }
+  } catch (err) {
+    console.warn(`[PHOTO LOADER WARNING] Could not fetch remote photo from ${photoUrl}:`, err);
+  }
+
   return null;
 }
 
@@ -140,7 +154,7 @@ export async function walkAndWritePhotoBlocks(
 
   for (let index = 0; index < photosList.length; index++) {
     const photoItem = photosList[index];
-    const imgInfo = await getPhotoBuffer(photoItem.photoUrl);
+    const imgInfo = await getPhotoBufferAsync(photoItem.photoUrl);
     if (!imgInfo) continue;
 
     const imageId = workbook.addImage({
@@ -186,3 +200,4 @@ export async function walkAndWritePhotoBlocks(
     captionCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
   }
 }
+

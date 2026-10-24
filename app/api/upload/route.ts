@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
-import { saveFile } from '@/lib/storage';
+import { uploadFile, ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } from '@/lib/storage';
 
 export async function POST(req: Request) {
   try {
@@ -22,12 +22,25 @@ export async function POST(req: Request) {
 
       const rawExt = matches[1].toLowerCase();
       const ext = rawExt === 'jpg' ? 'jpeg' : rawExt;
-      const buffer = Buffer.from(matches[2], 'base64');
-      const safeFilename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+      const mimeType = `image/${ext}`;
 
-      const saved = await saveFile(`uploads/${safeFilename}`, buffer, {
-        contentType: `image/${ext}`,
-      });
+      if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
+        return NextResponse.json(
+          { error: `Unsupported image format. Allowed formats: JPG, PNG, WEBP, GIF` },
+          { status: 400 }
+        );
+      }
+
+      const buffer = Buffer.from(matches[2], 'base64');
+      if (buffer.length > MAX_FILE_SIZE_BYTES) {
+        return NextResponse.json(
+          { error: `File size exceeds 10MB limit.` },
+          { status: 413 }
+        );
+      }
+
+      const safeFilename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+      const saved = await uploadFile(safeFilename, buffer, mimeType);
 
       return NextResponse.json({
         success: true,
@@ -44,15 +57,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
+    const mimeType = (file.type || 'image/jpeg').toLowerCase();
+    if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
+      return NextResponse.json(
+        { error: `Unsupported image format (${mimeType}). Allowed formats: JPG, PNG, WEBP, GIF` },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = path.extname(file.name) || '.jpg';
-    const safeFilename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
+    if (buffer.length > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: `File size exceeds 10MB limit.` },
+        { status: 413 }
+      );
+    }
 
-    const saved = await saveFile(`uploads/${safeFilename}`, buffer, {
-      contentType: file.type || 'image/jpeg',
-    });
+    const extFromName = path.extname(file.name).toLowerCase();
+    const ext = extFromName || (mimeType === 'image/png' ? '.png' : mimeType === 'image/webp' ? '.webp' : '.jpg');
+    const safeFilename = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext.startsWith('.') ? ext : `.${ext}`}`;
+
+    const saved = await uploadFile(safeFilename, buffer, mimeType);
 
     return NextResponse.json({
       success: true,

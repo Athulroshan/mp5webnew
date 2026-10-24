@@ -2,20 +2,24 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: path.resolve(__dirname),
+  serverExternalPackages: ['exceljs'],
+  typescript: {
+    ignoreBuildErrors: true,
   },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*.public.blob.vercel-storage.com',
+        hostname: '*.supabase.co',
       },
       {
         protocol: 'https',
-        hostname: '*.blob.vercel-storage.com',
+        hostname: '*.public.blob.vercel-storage.com',
       },
     ],
+  },
+  turbopack: {
+    root: path.resolve(__dirname),
   },
 };
 

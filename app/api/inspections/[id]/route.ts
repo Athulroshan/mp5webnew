@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -21,7 +19,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'Inspection not found' }, { status: 404 });
     }
 
-    const formattedMeasurements = inspection.measurements.map((m) => ({
+    const formattedMeasurements = inspection.measurements.map((m: any) => ({
       ...m,
       actualValues: m.actualValues ? JSON.parse(m.actualValues) : [],
     }));

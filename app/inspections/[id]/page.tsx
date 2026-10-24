@@ -25,7 +25,7 @@ export default async function EditInspectionPage({ params }: { params: Promise<{
   }
 
   // Parse measurements actualValues JSON
-  const formattedMeasurements = inspection.measurements.map((m) => ({
+  const formattedMeasurements = inspection.measurements.map((m: any) => ({
     ...m,
     actualValues: m.actualValues ? JSON.parse(m.actualValues) : [],
   }));
