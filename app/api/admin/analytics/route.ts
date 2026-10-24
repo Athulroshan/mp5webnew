@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { NextRequest } from "next/server";
+import type { Product } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const { error } = await requireAdmin(request);
@@ -22,12 +23,12 @@ export async function GET(request: NextRequest) {
       })
     ]);
 
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+    const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
     const totalOrders = orders.length;
 
     // Category breakdown
     const categoryStats: Record<string, { count: number; stock: number }> = {};
-    products.forEach((p) => {
+    products.forEach((p: Product) => {
       if (!categoryStats[p.category]) {
         categoryStats[p.category] = { count: 0, stock: 0 };
       }
@@ -42,9 +43,9 @@ export async function GET(request: NextRequest) {
     }));
 
     // Low stock products alert (< 10)
-    const lowStockProducts = products
-      .filter((p) => p.stock < 10)
-      .map((p) => ({
+    const lowStockProducts = (products as Product[])
+      .filter((p: Product) => p.stock < 10)
+      .map((p: Product) => ({
         id: p.id,
         name: p.name,
         category: p.category,

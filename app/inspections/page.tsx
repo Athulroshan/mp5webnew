@@ -78,93 +78,95 @@ export default function InspectionsDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FBF3E8] text-[#1F1F1F] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Title & CTA */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-7 sm:p-8 rounded-[24px] border border-[#E8DAC8] shadow-xs">
           <div>
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold text-xs uppercase tracking-wider mb-1">
-              <FileSpreadsheet className="w-4 h-4" />
-              Inspection Digitization System
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">QA Inspection Reports</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Data entry web interface linked directly to company Master Excel templates.
+            <p className="eyebrow-label mb-2 flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4 text-[#C8452A]" />
+              INSPECTION DIGITIZATION PLATFORM
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1F1F1F]">
+              QA Inspection <span className="text-[#C8452A]">Reports &amp; Audits</span>
+            </h1>
+            <p className="text-sm text-[#4A4540] mt-1.5 leading-relaxed">
+              Mobile-first data entry interface populating company 19-sheet Master Excel reports with embedded photo records.
             </p>
           </div>
 
           <Link
             href="/inspections/new"
-            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm rounded-xl shadow-lg shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 active:scale-95 transition"
+            className="btn-pill-primary shrink-0 py-3.5 px-7"
           >
-            <Plus className="w-5 h-5" />
-            START NEW INSPECTION
+            <Plus className="w-4 h-4 mr-1" />
+            <span>START NEW INSPECTION</span>
           </Link>
         </div>
 
         {/* Stats Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-blue-50 dark:bg-blue-950/40 text-blue-600 rounded-xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="bg-white p-6 rounded-[24px] border border-[#E8DAC8] shadow-xs flex items-center gap-4">
+            <div className="p-3 bg-[#F7ECE9] text-[#C8452A] rounded-2xl">
               <Layers className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Inspections</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{totalCount}</h3>
+              <p className="text-xs font-semibold text-[#7A746E]">Total Inspections</p>
+              <h3 className="text-2xl font-black text-[#1F1F1F]">{totalCount}</h3>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 text-amber-600 rounded-xl">
+          <div className="bg-white p-6 rounded-[24px] border border-[#E8DAC8] shadow-xs flex items-center gap-4">
+            <div className="p-3 bg-[#FDF6E9] text-[#C68B2C] rounded-2xl">
               <Clock className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Draft Inspections</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{draftCount}</h3>
+              <p className="text-xs font-semibold text-[#7A746E]">Draft Audits</p>
+              <h3 className="text-2xl font-black text-[#1F1F1F]">{draftCount}</h3>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 rounded-xl">
+          <div className="bg-white p-6 rounded-[24px] border border-[#E8DAC8] shadow-xs flex items-center gap-4">
+            <div className="p-3 bg-[#EFF3EB] text-[#4A5B38] rounded-2xl">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Completed Reports</p>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{completedCount}</h3>
+              <p className="text-xs font-semibold text-[#7A746E]">Completed Reports</p>
+              <h3 className="text-2xl font-black text-[#1F1F1F]">{completedCount}</h3>
             </div>
           </div>
         </div>
 
         {/* Filters & Search */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-[20px] border border-[#E8DAC8] shadow-xs">
           {/* Status Tabs */}
-          <div className="flex p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-xl text-xs font-semibold w-full sm:w-auto">
+          <div className="flex p-1 bg-[#F3E6D3] rounded-full text-xs font-bold w-full sm:w-auto border border-[#E8DAC8]">
             <button
               onClick={() => setFilterStatus('all')}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg transition ${
+              className={`flex-1 sm:flex-none px-5 py-2 rounded-full transition-all ${
                 filterStatus === 'all'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
+                  ? 'bg-[#C8452A] text-white shadow-xs'
+                  : 'text-[#4A4540] hover:text-[#1F1F1F]'
               }`}
             >
               All Reports ({totalCount})
             </button>
             <button
               onClick={() => setFilterStatus('draft')}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg transition ${
+              className={`flex-1 sm:flex-none px-5 py-2 rounded-full transition-all ${
                 filterStatus === 'draft'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
+                  ? 'bg-[#C8452A] text-white shadow-xs'
+                  : 'text-[#4A4540] hover:text-[#1F1F1F]'
               }`}
             >
               Drafts ({draftCount})
             </button>
             <button
               onClick={() => setFilterStatus('completed')}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg transition ${
+              className={`flex-1 sm:flex-none px-5 py-2 rounded-full transition-all ${
                 filterStatus === 'completed'
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
+                  ? 'bg-[#C8452A] text-white shadow-xs'
+                  : 'text-[#4A4540] hover:text-[#1F1F1F]'
               }`}
             >
               Completed ({completedCount})
@@ -173,67 +175,67 @@ export default function InspectionsDashboard() {
 
           {/* Search Box */}
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7A746E]" />
             <input
               type="text"
               placeholder="Search PO #, factory, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs pl-10 pr-4 py-2.5 bg-[#FBF3E8]/50 border border-[#E8DAC8] rounded-full focus:outline-none focus:ring-2 focus:ring-[#C8452A]"
             />
           </div>
         </div>
 
-        {/* Inspections List */}
+        {/* Inspections Grid */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p className="text-xs text-slate-500">Loading inspection records...</p>
+          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-[24px] border border-[#E8DAC8]">
+            <div className="w-8 h-8 border-4 border-[#C8452A] border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p className="text-xs text-[#7A746E]">Loading inspection records...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-center p-6">
-            <div className="p-4 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full mb-4">
+          <div className="flex flex-col items-center justify-center py-16 bg-white rounded-[24px] border border-[#E8DAC8] text-center p-6">
+            <div className="p-4 bg-[#F3E6D3] text-[#C8452A] rounded-full mb-4">
               <FileSpreadsheet className="w-8 h-8" />
             </div>
-            <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">No Inspections Found</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1 mb-6">
+            <h3 className="text-base font-bold text-[#1F1F1F]">No Inspections Found</h3>
+            <p className="text-xs text-[#7A746E] max-w-sm mt-1 mb-6">
               Get started by creating a new inspection draft. All data will be mapped to your master Excel report.
             </p>
             <Link
               href="/inspections/new"
-              className="px-5 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition"
+              className="btn-pill-primary text-xs py-2.5 px-6"
             >
               Start New Inspection
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+                className="bg-white border border-[#E8DAC8] rounded-[24px] p-6 shadow-xs hover:border-[#C8452A] transition-all flex flex-col justify-between hover:-translate-y-0.5"
               >
                 <div>
                   {/* Status & ID Header */}
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg">
+                      <span className="text-xs font-bold text-[#C8452A] bg-[#F7ECE9] px-2.5 py-1 rounded-full">
                         {item.inspectionNumber}
                       </span>
-                      <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-bold bg-[#EFF3EB] text-[#4A5B38] px-2 py-0.5 rounded-full border border-[#4A5B38]/20">
                         V{item.currentVersion || 1}
                       </span>
                     </div>
 
                     <span
-                      className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
                         item.status === 'FINALIZED'
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400'
+                          ? 'bg-[#EFF3EB] text-[#4A5B38]'
                           : item.status === 'REVISED'
-                          ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-400'
+                          ? 'bg-[#EBF1F6] text-[#1F2E3D]'
                           : item.status === 'ready_for_review'
-                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-400'
-                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400'
+                          ? 'bg-[#FDF6E9] text-[#C68B2C]'
+                          : 'bg-[#F3E6D3] text-[#4A4540]'
                       }`}
                     >
                       {item.status || 'DRAFT'}
@@ -241,37 +243,37 @@ export default function InspectionsDashboard() {
                   </div>
 
                   {/* PO Details */}
-                  <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 truncate">
+                  <h4 className="text-base font-bold text-[#1F1F1F] truncate">
                     PO: {item.poNumber || 'Unassigned'}
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate mb-4">
+                  <p className="text-xs text-[#7A746E] truncate mb-4">
                     {item.productDescription || 'Garment Item Description'}
                   </p>
 
-                  <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400 mb-4">
+                  <div className="space-y-2 text-xs text-[#4A4540] mb-5">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-400">
-                        <Building className="w-3.5 h-3.5" /> Factory:
+                      <span className="flex items-center gap-1.5 text-[#7A746E]">
+                        <Building className="w-3.5 h-3.5 text-[#C8452A]" /> Factory:
                       </span>
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">{item.factoryName || 'N/A'}</span>
+                      <span className="font-semibold text-[#1F1F1F]">{item.factoryName || 'N/A'}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-slate-400">
-                        <Calendar className="w-3.5 h-3.5" /> Date:
+                      <span className="flex items-center gap-1.5 text-[#7A746E]">
+                        <Calendar className="w-3.5 h-3.5 text-[#C8452A]" /> Date:
                       </span>
                       <span>{item.inspectionDate || 'N/A'}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span>Overall Result:</span>
+                      <span className="text-[#7A746E]">Overall Result:</span>
                       <span
-                        className={`font-bold ${
+                        className={`font-black ${
                           item.overallResult === 'FAIL'
                             ? 'text-red-600'
                             : item.overallResult === 'ON HOLD'
-                            ? 'text-amber-600'
-                            : 'text-emerald-600'
+                            ? 'text-[#C68B2C]'
+                            : 'text-[#4A5B38]'
                         }`}
                       >
                         {item.overallResult || 'PASS'}
@@ -281,10 +283,10 @@ export default function InspectionsDashboard() {
                 </div>
 
                 {/* Actions Footer */}
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div className="pt-4 border-t border-[#E8DAC8]/60 flex items-center justify-between gap-2">
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition"
+                    className="p-2 text-[#7A746E] hover:text-red-500 rounded-full hover:bg-red-50 transition-colors"
                     title="Delete Record"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -293,7 +295,7 @@ export default function InspectionsDashboard() {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setSelectedHistoryItem(item)}
-                      className="px-2.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold transition"
+                      className="px-3 py-1.5 bg-[#F3E6D3] hover:bg-[#EFE2CF] text-[#1F1F1F] rounded-full text-xs font-semibold transition-colors"
                       title="View Version History"
                     >
                       History
@@ -301,14 +303,14 @@ export default function InspectionsDashboard() {
 
                     <Link
                       href={`/inspections/${item.id}/preview`}
-                      className="flex items-center gap-1 px-3 py-2 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl text-xs font-bold hover:bg-blue-100 transition"
+                      className="px-3 py-1.5 bg-[#F7ECE9] text-[#C8452A] border border-[#C8452A]/30 rounded-full text-xs font-bold hover:bg-[#C8452A] hover:text-white transition-colors"
                     >
                       Preview
                     </Link>
 
                     <Link
                       href={`/inspections/${item.id}`}
-                      className="flex items-center gap-1 px-3 py-2 bg-slate-900 text-white dark:bg-slate-800 rounded-xl text-xs font-semibold hover:bg-slate-800 transition"
+                      className="px-3.5 py-1.5 bg-[#1F1F1F] text-white rounded-full text-xs font-semibold hover:bg-[#C8452A] transition-colors"
                     >
                       Edit
                     </Link>
@@ -317,7 +319,7 @@ export default function InspectionsDashboard() {
                       <a
                         href={`/api/inspections/${item.id}/download`}
                         download
-                        className="flex items-center gap-1 px-2.5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition"
+                        className="p-2 bg-[#4A5B38] text-white rounded-full text-xs font-semibold hover:bg-[#3d4b2e] transition-colors"
                         title="Download Excel Report"
                       >
                         <Download className="w-3.5 h-3.5" />
@@ -333,18 +335,18 @@ export default function InspectionsDashboard() {
 
       {/* Version History Modal */}
       {selectedHistoryItem && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E8DAC8] rounded-[28px] max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-[#E8DAC8] pb-3">
               <div>
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                <h3 className="text-base font-extrabold text-[#1F1F1F]">
                   Version History: {selectedHistoryItem.inspectionNumber}
                 </h3>
-                <p className="text-xs text-slate-500">PO: {selectedHistoryItem.poNumber} | Current: Version V{selectedHistoryItem.currentVersion || 1}</p>
+                <p className="text-xs text-[#7A746E]">PO: {selectedHistoryItem.poNumber} | Current: Version V{selectedHistoryItem.currentVersion || 1}</p>
               </div>
               <button
                 onClick={() => setSelectedHistoryItem(null)}
-                className="px-2.5 py-1 text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200"
+                className="px-3 py-1 text-xs font-bold bg-[#F3E6D3] text-[#1F1F1F] rounded-full hover:bg-[#EFE2CF]"
               >
                 Close
               </button>
@@ -352,24 +354,24 @@ export default function InspectionsDashboard() {
 
             <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
               {/* Current Version */}
-              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl space-y-1">
+              <div className="p-4 bg-[#F7ECE9] border border-[#C8452A]/30 rounded-[20px] space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-extrabold text-blue-700 dark:text-blue-400">
+                  <span className="font-extrabold text-[#C8452A]">
                     Version V{selectedHistoryItem.currentVersion || 1} (Active)
                   </span>
-                  <span className="text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-[#C8452A] text-white px-2 py-0.5 rounded-full">
                     {selectedHistoryItem.status || 'DRAFT'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-300">
+                <p className="text-xs text-[#4A4540]">
                   Last updated: {new Date(selectedHistoryItem.updatedAt).toLocaleString()}
                 </p>
                 {selectedHistoryItem.excelFilePath && (
-                  <div className="pt-1">
+                  <div className="pt-2">
                     <a
                       href={`/api/inspections/${selectedHistoryItem.id}/download`}
                       download
-                      className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C8452A] hover:underline"
                     >
                       <Download className="w-3.5 h-3.5" /> Download Active Version Excel
                     </a>
@@ -380,21 +382,21 @@ export default function InspectionsDashboard() {
               {/* Archived Versions */}
               {selectedHistoryItem.versions && selectedHistoryItem.versions.length > 0 ? (
                 selectedHistoryItem.versions.map((ver: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1 text-xs">
+                  <div key={idx} className="p-3 bg-[#F3E6D3]/60 border border-[#E8DAC8] rounded-[18px] space-y-1 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-800 dark:text-slate-200">
+                      <span className="font-bold text-[#1F1F1F]">
                         Version V{ver.versionNumber} Snapshot
                       </span>
-                      <span className="text-[10px] text-slate-400">{new Date(ver.createdAt).toLocaleString()}</span>
+                      <span className="text-[10px] text-[#7A746E]">{new Date(ver.createdAt).toLocaleString()}</span>
                     </div>
                     {ver.changeReason && (
-                      <p className="text-slate-600 dark:text-slate-400 italic">Reason: {ver.changeReason}</p>
+                      <p className="text-[#4A4540] italic">Reason: {ver.changeReason}</p>
                     )}
-                    <p className="text-[11px] text-slate-500">Created by: {ver.createdByName || 'QA Auditor'}</p>
+                    <p className="text-[11px] text-[#7A746E]">Created by: {ver.createdByName || 'QA Auditor'}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-slate-400 text-center py-3">No previous archived versions recorded yet.</p>
+                <p className="text-xs text-[#7A746E] text-center py-3">No previous archived versions recorded yet.</p>
               )}
             </div>
           </div>

@@ -1,0 +1,445 @@
+[
+  {
+    "id": "prod-round-neck-1",
+    "name": "Classic Cotton Round Neck T-Shirt",
+    "description": "Soft 100% cotton plain round neck t-shirt. Comfortable regular fit for everyday wear and custom printing.",
+    "price": 499,
+    "originalPrice": 899,
+    "category": "Round Neck T-Shirts",
+    "badge": "Pure Cotton",
+    "stock": 150,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-20T10:00:00.000Z",
+    "images": [
+      {
+        "url": "/images/products/round-neck/round-neck-black.png",
+        "alt": "Black Round Neck T-Shirt"
+      },
+      {
+        "url": "/images/products/round-neck/round-neck-beige.png",
+        "alt": "Beige Round Neck T-Shirt"
+      },
+      {
+        "url": "/images/products/round-neck/round-neck-maroon.png",
+        "alt": "Maroon Round Neck T-Shirt"
+      },
+      {
+        "url": "/images/products/round-neck/round-neck-white.png",
+        "alt": "White Round Neck T-Shirt"
+      }
+    ],
+    "colors": [
+      {
+        "name": "Black",
+        "hex": "#111111",
+        "available": true,
+        "imageIndex": 0
+      },
+      {
+        "name": "Beige",
+        "hex": "#D4B996",
+        "available": true,
+        "imageIndex": 1
+      },
+      {
+        "name": "Maroon",
+        "hex": "#6B1724",
+        "available": true,
+        "imageIndex": 2
+      },
+      {
+        "name": "White",
+        "hex": "#FFFFFF",
+        "available": true,
+        "imageIndex": 3
+      }
+    ],
+    "sizes": [
+      {
+        "name": "S",
+        "available": true,
+        "stock": 40
+      },
+      {
+        "name": "M",
+        "available": true,
+        "stock": 50
+      },
+      {
+        "name": "L",
+        "available": true,
+        "stock": 40
+      },
+      {
+        "name": "XL",
+        "available": true,
+        "stock": 20
+      }
+    ]
+  },
+  {
+    "id": "prod-round-neck-2",
+    "name": "Classic Cotton Round Neck T-Shirt",
+    "description": "Soft 100% cotton plain round neck t-shirt. Comfortable regular fit for everyday wear and custom printing.",
+    "price": 599,
+    "originalPrice": 999,
+    "category": "Round Neck T-Shirts",
+    "badge": "Pure Cotton",
+    "stock": 90,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-18T10:00:00.000Z",
+    "images": [
+      {
+        "url": "/images/products/round-neck/round-neck-black.png",
+        "alt": "Black Round Neck T-Shirt"
+      },
+      {
+        "url": "/images/products/round-neck/round-neck-beige.png",
+        "alt": "Beige Round Neck T-Shirt"
+      },
+      {
+        "url": "/images/products/round-neck/round-neck-maroon.png",
+        "alt": "Maroon Round Neck T-Shirt"
+      },
+      {
+        "url": "/images/products/round-neck/round-neck-white.png",
+        "alt": "White Round Neck T-Shirt"
+      }
+    ],
+    "colors": [
+      {
+        "name": "Black",
+        "hex": "#111111",
+        "available": true,
+        "imageIndex": 0
+      },
+      {
+        "name": "Beige",
+        "hex": "#D4B996",
+        "available": true,
+        "imageIndex": 1
+      },
+      {
+        "name": "Maroon",
+        "hex": "#6B1724",
+        "available": true,
+        "imageIndex": 2
+      },
+      {
+        "name": "White",
+        "hex": "#FFFFFF",
+        "available": true,
+        "imageIndex": 3
+      }
+    ],
+    "sizes": [
+      {
+        "name": "M",
+        "available": true,
+        "stock": 30
+      },
+      {
+        "name": "L",
+        "available": true,
+        "stock": 40
+      },
+      {
+        "name": "XL",
+        "available": true,
+        "stock": 20
+      }
+    ]
+  },
+  {
+    "id": "prod-polo-1",
+    "name": "Premium Pique Knit Polo T-Shirt",
+    "description": "Durable 220 GSM honeycomb pique cotton with mother-of-pearl buttons and shape-retaining flat knit collar.",
+    "price": 699,
+    "originalPrice": 1199,
+    "category": "Polo T-Shirts",
+    "badge": "Popular",
+    "stock": 110,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-19T10:00:00.000Z",
+    "images": [],
+    "colors": [
+      {
+        "name": "Royal Blue",
+        "hex": "#2563eb",
+        "available": true
+      },
+      {
+        "name": "Jet Black",
+        "hex": "#111111",
+        "available": true
+      },
+      {
+        "name": "Forest Green",
+        "hex": "#14532d",
+        "available": true
+      }
+    ],
+    "sizes": [
+      {
+        "name": "S",
+        "available": true,
+        "stock": 25
+      },
+      {
+        "name": "M",
+        "available": true,
+        "stock": 35
+      },
+      {
+        "name": "L",
+        "available": true,
+        "stock": 30
+      },
+      {
+        "name": "XL",
+        "available": true,
+        "stock": 20
+      }
+    ]
+  },
+  {
+    "id": "prod-caps-1",
+    "name": "Classic Adjustable Cap",
+    "description": "Comfortable plain cap with breathable mesh and curved visor. Easy back strap adjustment for all head sizes. Ideal for everyday wear and custom embroidery.",
+    "price": 349,
+    "originalPrice": 599,
+    "category": "Caps",
+    "badge": "Adjustable",
+    "stock": 200,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-17T10:00:00.000Z",
+    "images": [
+      {
+        "url": "/images/products/caps/cap-black-white.png",
+        "alt": "Black & White Mesh Cap"
+      },
+      {
+        "url": "/images/products/caps/cap-navy.png",
+        "alt": "Navy Blue Baseball Cap"
+      },
+      {
+        "url": "/images/products/caps/cap-green-white.png",
+        "alt": "Green & White Mesh Cap"
+      }
+    ],
+    "colors": [
+      {
+        "name": "Black & White",
+        "hex": "#111111",
+        "available": true,
+        "imageIndex": 0
+      },
+      {
+        "name": "Navy Blue",
+        "hex": "#1e3a8a",
+        "available": true,
+        "imageIndex": 1
+      },
+      {
+        "name": "Green & White",
+        "hex": "#15803d",
+        "available": true,
+        "imageIndex": 2
+      }
+    ],
+    "sizes": [
+      {
+        "name": "Free Size",
+        "available": true,
+        "stock": 200
+      }
+    ]
+  },
+  {
+    "id": "prod-school-1",
+    "name": "School Uniform Set",
+    "description": "Comfortable and durable school uniform sets for boys and girls. Soft, wrinkle-resistant fabric made for daily school wear and sports activities.",
+    "price": 899,
+    "originalPrice": 1499,
+    "category": "School Uniforms",
+    "badge": "School Wear",
+    "stock": 250,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-16T10:00:00.000Z",
+    "images": [
+      {
+        "url": "/images/products/school-uniforms/school-regular-set.jpg",
+        "alt": "Classroom Uniform Set - Shirt & Trousers / Salwar & Waistcoat"
+      },
+      {
+        "url": "/images/products/school-uniforms/school-sports-set.jpg",
+        "alt": "House Sports Uniform - Yellow Polo & Track Pants"
+      }
+    ],
+    "colors": [
+      {
+        "name": "Classroom Set (Sky Blue & Navy)",
+        "hex": "#38bdf8",
+        "available": true,
+        "imageIndex": 0
+      },
+      {
+        "name": "Sports PT Set (Yellow & Navy)",
+        "hex": "#eab308",
+        "available": true,
+        "imageIndex": 1
+      }
+    ],
+    "sizes": [
+      {
+        "name": "Age 5-7 (Size 26-28)",
+        "available": true,
+        "stock": 60
+      },
+      {
+        "name": "Age 8-10 (Size 30-32)",
+        "available": true,
+        "stock": 70
+      },
+      {
+        "name": "Age 11-13 (Size 34-36)",
+        "available": true,
+        "stock": 60
+      },
+      {
+        "name": "Age 14+ (Size 38-40)",
+        "available": true,
+        "stock": 60
+      }
+    ]
+  },
+  {
+    "id": "prod-shirts-1",
+    "name": "Executive Formal Cotton Oxford Shirt",
+    "description": "Crisp 100% fine yarn Egyptian cotton shirt with reinforced collar stays and double-needle armhole stitching.",
+    "price": 899,
+    "originalPrice": 1499,
+    "category": "Shirts",
+    "badge": "Premium",
+    "stock": 140,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-15T10:00:00.000Z",
+    "images": [],
+    "colors": [
+      {
+        "name": "Classic White",
+        "hex": "#ffffff",
+        "available": true
+      },
+      {
+        "name": "Sky Blue",
+        "hex": "#38bdf8",
+        "available": true
+      },
+      {
+        "name": "Silver Grey",
+        "hex": "#9ca3af",
+        "available": true
+      }
+    ],
+    "sizes": [
+      {
+        "name": "38 (S)",
+        "available": true,
+        "stock": 30
+      },
+      {
+        "name": "40 (M)",
+        "available": true,
+        "stock": 40
+      },
+      {
+        "name": "42 (L)",
+        "available": true,
+        "stock": 40
+      },
+      {
+        "name": "44 (XL)",
+        "available": true,
+        "stock": 30
+      }
+    ]
+  },
+  {
+    "id": "prod-uniform-sets-1",
+    "name": "Heavy-Duty Industrial Worker Uniform",
+    "description": "Tough industrial work uniform for factory, site, and maintenance workers. Durable fabric with reinforced stitching for safety, long wear, and all-day comfort.",
+    "price": 1199,
+    "originalPrice": 1999,
+    "category": "Industry & Worker Uniforms",
+    "badge": "Heavy Duty",
+    "stock": 100,
+    "ratingsAverage": 0,
+    "ratingsCount": 0,
+    "isActive": true,
+    "createdAt": "2026-10-18T10:00:00.000Z",
+    "images": [
+      {
+        "url": "/images/products/work-uniforms/industrial-coverall.png",
+        "alt": "Safety Boiler Suit Coverall with Reflective Tapes"
+      },
+      {
+        "url": "/images/products/work-uniforms/worker-shirt-pant-set.png",
+        "alt": "Industrial Worker Shirt and Trouser Set"
+      }
+    ],
+    "colors": [
+      {
+        "name": "Safety Boiler Suit (Reflective)",
+        "hex": "#1e293b",
+        "available": true,
+        "imageIndex": 0
+      },
+      {
+        "name": "Navy Work Shirt & Pant Set",
+        "hex": "#172554",
+        "available": true,
+        "imageIndex": 1
+      }
+    ],
+    "sizes": [
+      {
+        "name": "S",
+        "available": true,
+        "stock": 20
+      },
+      {
+        "name": "M",
+        "available": true,
+        "stock": 25
+      },
+      {
+        "name": "L",
+        "available": true,
+        "stock": 25
+      },
+      {
+        "name": "XL",
+        "available": true,
+        "stock": 20
+      },
+      {
+        "name": "XXL",
+        "available": true,
+        "stock": 10
+      }
+    ]
+  }
+]

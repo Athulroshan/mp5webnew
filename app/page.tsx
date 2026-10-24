@@ -1,253 +1,145 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { ShoppingBag, Zap, CheckCircle, ArrowUp } from "lucide-react";
-
-const trustStatements = [
-  { icon: CheckCircle, label: "Quality You Can Wear" },
-  { icon: CheckCircle, label: "Trust You Can Rely On" },
-  { icon: CheckCircle, label: "On-Time. Every Time." },
-];
+import { ClipboardList, Zap } from "lucide-react";
+import MLogo from "@/components/ui/m-logo";
 
 export default function HomePage() {
-  const [hovered, setHovered] = useState<"products" | "services" | null>(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 150);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
-      <section
-        className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center"
-        style={{
-          background:
-            "linear-gradient(135deg, #c8d8f8 0%, #d4c8f0 35%, #e8c8e8 65%, #f0c8d8 100%)",
-        }}
+    <div className="h-screen max-h-screen w-screen overflow-hidden bg-[#FBF3E8] text-[#1F1F1F] flex flex-col justify-between p-6 sm:p-10 lg:px-16 lg:py-8 relative selection:bg-[#C8452A] selection:text-white">
+      {/* ── Background Organic Shapes & Blob Accents ── */}
+      <div
+        className="absolute -top-32 -left-24 w-[500px] h-[500px] rounded-full bg-[#F3E6D3]/70 blur-3xl pointer-events-none -z-0"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-[-10%] right-[-5%] w-[550px] h-[550px] rounded-full bg-[#F3E6D3]/50 blur-3xl pointer-events-none -z-0"
+        aria-hidden="true"
+      />
+
+      {/* Thin curved terracotta line accent in bottom-left */}
+      <svg
+        className="absolute bottom-0 left-0 w-72 h-72 pointer-events-none z-0 opacity-40"
+        viewBox="0 0 320 320"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
       >
-        {/* ── Decorative shapes ── */}
-        {/* Top-left angled lines */}
-        <svg
-          className="absolute top-12 left-10 opacity-30 pointer-events-none"
-          width="60"
-          height="75"
-          viewBox="0 0 60 75"
-          fill="none"
-        >
-          <line x1="5" y1="0" x2="5" y2="75" stroke="#6366f1" strokeWidth="1.5" />
-          <line x1="20" y1="0" x2="20" y2="75" stroke="#6366f1" strokeWidth="1.5" />
-          <line
-            x1="12"
-            y1="40"
-            x2="12"
-            y2="0"
-            stroke="#6366f1"
-            strokeWidth="1.5"
-            transform="rotate(30 12 40)"
-          />
-        </svg>
+        <path
+          d="M -20 280 C 60 280, 140 220, 160 140 C 170 100, 180 30, 240 -10"
+          stroke="#C8452A"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M -40 320 C 50 320, 160 260, 190 170"
+          stroke="#C8452A"
+          strokeWidth="1"
+          strokeDasharray="4 6"
+          opacity="0.4"
+        />
+      </svg>
 
-        {/* Top-right crosshair */}
-        <svg
-          className="absolute top-12 right-12 opacity-25 pointer-events-none"
-          width="52"
-          height="52"
-          viewBox="0 0 52 52"
-          fill="none"
-        >
-          <circle cx="26" cy="26" r="11" stroke="#7c3aed" strokeWidth="1.5" />
-          <line x1="26" y1="0" x2="26" y2="52" stroke="#7c3aed" strokeWidth="1.5" />
-          <line x1="0" y1="26" x2="52" y2="26" stroke="#7c3aed" strokeWidth="1.5" />
-        </svg>
+      {/* Small floating terracotta slanted pill accent near the collage */}
+      <div
+        className="hidden lg:block absolute top-14 left-[48%] xl:left-[50%] w-4 h-14 rounded-full bg-[#C8452A] rotate-[24deg] shadow-xs z-20"
+        aria-hidden="true"
+      />
 
-        {/* Top-right small plus */}
-        <svg
-          className="absolute top-10 right-36 opacity-25 pointer-events-none"
-          width="20"
-          height="20"
-          viewBox="0 0 20 20"
-          fill="none"
-        >
-          <line x1="10" y1="0" x2="10" y2="20" stroke="#6366f1" strokeWidth="1.5" />
-          <line x1="0" y1="10" x2="20" y2="10" stroke="#6366f1" strokeWidth="1.5" />
-        </svg>
+      {/* ── Top-Left: Company Logo & Minimal Branding ── */}
+      <header className="relative z-30 w-full flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3.5 group">
+          <div className="w-12 h-12 flex items-center justify-center rounded-2xl border border-[#E8DAC8] bg-[#FBF3E8] p-1 shadow-xs group-hover:border-[#C8452A] transition-colors">
+            <MLogo
+              size={38}
+              strokeColor="#1F1F1F"
+              className="group-hover:scale-105 transition-transform"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-extrabold tracking-tight text-[#1F1F1F] leading-tight">
+              MPSS
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#7A746E]">
+              My Profile Sourcing Solutions
+            </span>
+          </div>
+        </Link>
+      </header>
 
-        {/* Bottom-left leaf */}
-        <svg
-          className="absolute bottom-16 left-12 opacity-25 pointer-events-none"
-          width="44"
-          height="56"
-          viewBox="0 0 44 56"
-          fill="none"
-        >
-          <path
-            d="M22 2 C3 11 3 45 22 54 C41 45 41 11 22 2Z"
-            stroke="#6366f1"
-            strokeWidth="1.5"
-            fill="none"
-          />
-          <line x1="22" y1="2" x2="22" y2="54" stroke="#6366f1" strokeWidth="1.5" />
-        </svg>
+      {/* ── Main Single-Screen Hero (No Scrolling) ── */}
+      <main className="relative z-10 w-full flex-1 flex items-center my-auto">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center gap-8 lg:gap-12 xl:gap-16">
+          {/* Left Column: Eyebrow + Heading + Paragraph + 2 Buttons */}
+          <div className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center max-w-xl">
+            {/* Eyebrow Label */}
+            <p className="eyebrow-label mb-3 sm:mb-4">
+              CUSTOM APPAREL &amp; QUALITY INSPECTION SERVICES
+            </p>
 
-        {/* Bottom-right hexagon */}
-        <svg
-          className="absolute bottom-12 right-12 opacity-25 pointer-events-none"
-          width="58"
-          height="58"
-          viewBox="0 0 58 58"
-          fill="none"
-        >
-          <polygon
-            points="29,3 55,17 55,41 29,55 3,41 3,17"
-            stroke="#7c3aed"
-            strokeWidth="1.5"
-            fill="none"
-          />
-        </svg>
+            {/* Two-Tone H1 Heading: My Profile / Sourcing Solutions */}
+            <h1 className="text-4xl sm:text-5xl lg:text-[54px] xl:text-[64px] font-black tracking-[-0.035em] leading-[1.06] text-[#1F1F1F] mb-5">
+              My Profile <br />
+              <span className="text-[#C8452A]">Sourcing Solutions</span>
+            </h1>
 
-        {/* ── Main content ── */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-24 w-full max-w-4xl mx-auto my-auto">
-          {/* Heading Line 1 */}
-          <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-none mb-2"
-            style={{ color: "#1e1b4b" }}
-          >
-            My Profile
-          </h1>
+            {/* Short Paragraph */}
+            <p className="text-body-warm text-sm sm:text-base lg:text-lg mb-7 sm:mb-8 max-w-[500px]">
+              We help brands source and manufacture quality apparel from trusted factories,
+              with reliable inspection services at every stage — so you can focus on what you do best.
+            </p>
 
-          {/* Heading Line 2 */}
-          <h2
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-none mb-6"
-            style={{
-              background: "linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Sourcing Solutions
-          </h2>
+            {/* Two Pill Buttons: Products & Services */}
+            <div className="flex flex-wrap items-center gap-4 sm:gap-5">
+              {/* Secondary Pill Button: Products */}
+              <Link
+                href="/products"
+                id="hero-products-pill"
+                className="btn-pill-secondary group px-7 py-3 text-sm font-bold inline-flex items-center gap-2.5"
+              >
+                <ClipboardList className="w-4 h-4 text-[#C8452A] group-hover:scale-110 transition-transform" />
+                <span>Products</span>
+              </Link>
 
-          {/* Subtitle */}
-          <p
-            className="text-lg sm:text-xl font-normal mb-4"
-            style={{ color: "#4b5563" }}
-          >
-            Custom Apparel &amp; Quality Inspection Services
-          </p>
-
-          {/* Accent line */}
-          <div
-            className="w-14 h-1 rounded-full mb-12"
-            style={{
-              background: "linear-gradient(90deg, #6366f1, #a855f7)",
-            }}
-          />
-
-          {/* Pill navigation buttons */}
-          <div className="flex items-center justify-center gap-5 mb-16">
-            {/* Products Pill */}
-            <Link
-              href="/products"
-              onMouseEnter={() => setHovered("products")}
-              onMouseLeave={() => setHovered(null)}
-              className="flex items-center gap-2.5 px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-300 shadow-md hover:shadow-xl"
-              style={{
-                background:
-                  hovered === "products"
-                    ? "linear-gradient(135deg,#4f46e5,#7c3aed)"
-                    : "#ffffff",
-                color: hovered === "products" ? "#ffffff" : "#4f46e5",
-                boxShadow:
-                  hovered === "products"
-                    ? "0 10px 30px rgba(99,102,241,0.40)"
-                    : "0 4px 20px rgba(0,0,0,0.08)",
-                transform:
-                  hovered === "products" ? "scale(1.05)" : "scale(1)",
-              }}
-            >
-              <ShoppingBag
-                className="h-4 w-4"
-                style={{
-                  color: hovered === "products" ? "#ffffff" : "#4f46e5",
-                }}
-              />
-              Products
-            </Link>
-
-            {/* Services Pill */}
-            <Link
-              href="/services"
-              onMouseEnter={() => setHovered("services")}
-              onMouseLeave={() => setHovered(null)}
-              className="flex items-center gap-2.5 px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-300 shadow-md hover:shadow-xl"
-              style={{
-                background:
-                  hovered === "services"
-                    ? "#ffffff"
-                    : "linear-gradient(135deg,#4f46e5,#7c3aed)",
-                color: hovered === "services" ? "#4f46e5" : "#ffffff",
-                boxShadow:
-                  hovered === "services"
-                    ? "0 4px 20px rgba(0,0,0,0.08)"
-                    : "0 10px 30px rgba(99,102,241,0.40)",
-                transform:
-                  hovered === "services" ? "scale(1.05)" : "scale(1)",
-              }}
-            >
-              <Zap
-                className="h-4 w-4"
-                style={{
-                  color: hovered === "services" ? "#4f46e5" : "#ffffff",
-                }}
-              />
-              Services
-            </Link>
+              {/* Primary Pill Button: Services */}
+              <Link
+                href="/services"
+                id="hero-services-pill"
+                className="btn-pill-primary group px-7 py-3 text-sm font-bold inline-flex items-center gap-2.5"
+              >
+                <Zap className="w-4 h-4 text-white fill-current group-hover:scale-110 transition-transform" />
+                <span>Services</span>
+              </Link>
+            </div>
           </div>
 
-          {/* Trust Statements Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-300/80">
-            {trustStatements.map((t, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2.5 sm:px-8 py-1 sm:py-0"
-              >
-                <t.icon
-                  className="h-4 w-4 flex-shrink-0"
-                  style={{ color: "#6366f1" }}
+          {/* Right Column: Image Collage from Reference */}
+          <div className="lg:col-span-6 xl:col-span-6 flex items-center justify-center lg:justify-end relative">
+            <div className="relative w-full max-w-[520px] lg:max-w-none lg:w-[110%] lg:-mr-12 xl:-mr-16">
+              {/* Responsive Collage with clean warm border and rounded edges */}
+              <div className="relative rounded-[24px] lg:rounded-l-[32px] lg:rounded-r-none overflow-hidden border border-[#E8DAC8]/90 lg:border-r-0 shadow-[0_20px_50px_-15px_rgba(74,69,64,0.18)]">
+                <img
+                  src="/hero-collage.jpg"
+                  alt="Apparel craftsmanship and quality inspection: sewing machine operator, folded tees, fabric swatches and measuring tape"
+                  className="w-full max-h-[50vh] sm:max-h-[58vh] lg:max-h-[66vh] xl:max-h-[70vh] object-cover transition-transform duration-700 hover:scale-[1.01]"
                 />
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "#374151" }}
-                >
-                  {t.label}
-                </span>
+
+                {/* Floating AQL 2.5 Quality Badge */}
+                <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 bg-white/95 backdrop-blur-md px-4 py-2 rounded-full border border-[#E8DAC8] shadow-xs flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#C8452A] animate-pulse" />
+                  <span className="text-xs font-bold text-[#1F1F1F]">
+                    AQL 2.5 Certified Inspection
+                  </span>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
+      </main>
 
-        {/* Scroll-to-top floating button */}
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-[#0f172a] text-white flex items-center justify-center shadow-xl hover:bg-[#1e293b] transition-all hover:scale-110 active:scale-95"
-          title="Scroll to Top"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
-      </section>
+      {/* Clean bottom buffer */}
+      <div className="w-full h-2" aria-hidden="true" />
     </div>
   );
 }
-
-

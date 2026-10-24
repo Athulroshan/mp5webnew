@@ -31,13 +31,8 @@ function LayoutShell({ children }: { children: React.ReactNode }) {
   }
 
   if (isHome) {
-    // Landing page — no top header section, no top padding offset
-    return (
-      <>
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </>
-    );
+    // Landing page — single screen 100vh without global header/footer
+    return <main className="min-h-screen lg:h-screen lg:overflow-hidden">{children}</main>;
   }
 
   return (
@@ -57,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans bg-[#FBF3E8] text-[#1F1F1F]">
         <UserProvider>
           <CartProvider>
             <LayoutShell>{children}</LayoutShell>

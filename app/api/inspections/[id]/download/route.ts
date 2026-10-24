@@ -1,17 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAuth } from '@/lib/auth';
-import { getFileStream } from '@/lib/storage';
+import fs from 'fs';
 import path from 'path';
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // Authenticate user before allowing report download
-    const { user, error: authError } = await requireAuth(req);
-    if (authError || !user) {
-      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id } = await params;
     const inspection = await prisma.inspection.findUnique({
       where: { id },
@@ -21,24 +14,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Report file not found or not generated yet' }, { status: 404 });
     }
 
-    const { stream, contentType, filename } = await getFileStream(inspection.excelFilePath);
-    const safeFilename = filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`;
+    const relativePath = inspection.excelFilePath.startsWith('/') ? inspection.excelFilePath.slice(1) : inspection.excelFilePath;
+    const filePath = path.join(process.cwd(), 'public', relativePath);
 
-    if (Buffer.isBuffer(stream)) {
-      return new NextResponse(new Uint8Array(stream), {
-        status: 200,
-        headers: {
-          'Content-Type': contentType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `attachment; filename="${safeFilename}"`,
-        },
-      });
+    if (!fs.existsSync(filePath)) {
+      return NextResponse.json({ error: `File missing on server: ${filePath}` }, { status: 404 });
     }
 
-    return new NextResponse(stream as any, {
+    const fileBuffer = fs.readFileSync(filePath);
+    const filename = path.basename(filePath);
+
+    return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
-        'Content-Type': contentType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${safeFilename}"`,
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="${filename}"`,
       },
     });
   } catch (error: any) {

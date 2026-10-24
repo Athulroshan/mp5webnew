@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -14,112 +16,110 @@ import {
   ClipboardList,
 } from 'lucide-react';
 
-export const metadata = {
-  title: 'Garment Inspection Digitization System | MPSS Services',
-  description: 'Easy Google-Form-style web interface linked directly to company Master Excel Inspection Report templates.',
-};
-
 export default function InspectionSystemServicesPage() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FBF3E8] text-[#1F1F1F] py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Service Hero Header */}
         <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-wider">
-            <FileSpreadsheet className="w-4 h-4" />
-            MPSS QA Digitization Platform
-          </div>
+          <p className="eyebrow-label mb-2 flex items-center justify-center gap-2">
+            <FileSpreadsheet className="w-4 h-4 text-[#C8452A]" />
+            MPSS QA DIGITIZATION PLATFORM
+          </p>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-            Garment Inspection Digitization System
+          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight text-[#1F1F1F]">
+            Garment Inspection <span className="text-[#C8452A]">Digitization System</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            A mobile-first, Google-Form-style QA data entry platform that maps all inspection inputs, photos, checklist items, and measurement specs directly into your company's official **19-Worksheet Master Excel Report Template**.
+          <p className="text-sm sm:text-base text-[#4A4540] leading-relaxed">
+            A mobile-first, Google-Form-style QA data entry platform that maps all inspection inputs, photos, checklist items, and measurement specs directly into your company's official <strong>19-Worksheet Master Excel Report Template</strong>.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
               href="/inspections/new"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-sm rounded-xl shadow-xl shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 active:scale-95 transition"
+              className="btn-pill-primary w-full sm:w-auto py-3.5 px-8"
             >
-              <Plus className="w-5 h-5" />
-              START NEW INSPECTION
+              <Plus className="w-4 h-4 mr-1" />
+              <span>START NEW INSPECTION</span>
             </Link>
 
             <Link
               href="/inspections"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-sm rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+              className="btn-pill-secondary w-full sm:w-auto py-3.5 px-8"
             >
-              <ClipboardList className="w-5 h-5 text-blue-500" />
-              VIEW INSPECTION DASHBOARD
+              <ClipboardList className="w-4 h-4 text-[#C8452A] mr-1" />
+              <span>VIEW QA DASHBOARD</span>
             </Link>
           </div>
         </div>
 
         {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-            <div className="p-3 bg-blue-50 dark:bg-blue-950/40 text-blue-600 rounded-xl w-fit">
+          <div className="card-warm p-7 space-y-3">
+            <div className="p-3 bg-[#F7ECE9] text-[#C8452A] rounded-2xl w-fit">
               <Smartphone className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold">Google-Form-Style Mobile Entry</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Step-by-step 8-section wizard designed for phone/tablet camera photo capture, live tolerance evaluation, and quick QA responses.
+            <h3 className="text-base font-bold text-[#1F1F1F]">Google-Form-Style Mobile Entry</h3>
+            <p className="text-xs text-[#4A4540] leading-relaxed">
+              Step-by-step 8-section wizard designed for phone/tablet camera photo capture, live tolerance evaluation, and quick QA responses on the factory floor.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 rounded-xl w-fit">
+          <div className="card-warm p-7 space-y-3">
+            <div className="p-3 bg-[#EFF3EB] text-[#4A5B38] rounded-2xl w-fit">
               <FileCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold">19-Worksheet Master Excel Preserved</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Preserves all 19 original worksheets (`Audit`, `MEASURE`, `Inspection photos`, `Defects photos`, `CAP`, `PACKING LIST`, etc.) without altering formatting or formulas.
+            <h3 className="text-base font-bold text-[#1F1F1F]">19-Worksheet Master Excel Preserved</h3>
+            <p className="text-xs text-[#4A4540] leading-relaxed">
+              Preserves all 19 original worksheets (Audit, MEASURE, Inspection photos, Defects photos, CAP, PACKING LIST, etc.) without altering formatting or formulas.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 rounded-xl w-fit">
+          <div className="card-warm p-7 space-y-3">
+            <div className="p-3 bg-[#FDF6E9] text-[#C68B2C] rounded-2xl w-fit">
               <Camera className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold">Embedded Photo Grid Reports</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Photos are scaled and embedded directly inside the Excel photo worksheets in a 4-column structured grid alongside captions.
+            <h3 className="text-base font-bold text-[#1F1F1F]">Embedded Photo Grid Reports</h3>
+            <p className="text-xs text-[#4A4540] leading-relaxed">
+              Photos are scaled and embedded directly inside Excel photo worksheets in a 4-column structured grid alongside timestamps and defect labels.
             </p>
           </div>
         </div>
 
         {/* System Workflow Steps */}
-        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-          <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
-            <h2 className="text-xl font-bold">Inspection Digitization Workflow</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">End-to-end data entry to downloadable Excel report execution.</p>
+        <div className="bg-white p-8 sm:p-10 rounded-[28px] border border-[#E8DAC8] shadow-xs space-y-8">
+          <div className="border-b border-[#E8DAC8] pb-4">
+            <p className="eyebrow-label mb-1">AUTOMATED PIPELINE</p>
+            <h2 className="text-2xl font-extrabold text-[#1F1F1F]">
+              Inspection Digitization <span className="text-[#C8452A]">Workflow</span>
+            </h2>
+            <p className="text-xs text-[#7A746E]">End-to-end data entry to downloadable Excel report execution.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2">
-              <span className="text-xs font-black text-blue-600">STEP 01</span>
-              <h4 className="font-bold">QA Data Entry</h4>
-              <p className="text-slate-500">QA enters PO details, answers 22 checklist items, and takes camera photos.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 text-xs">
+            <div className="p-5 bg-[#F3E6D3] rounded-[20px] space-y-2 border border-[#E8DAC8]">
+              <span className="text-xs font-black text-[#C8452A]">STEP 01</span>
+              <h4 className="font-bold text-[#1F1F1F]">QA Data Entry</h4>
+              <p className="text-[#4A4540]">QA enters PO details, answers 22 checklist items, and captures photo evidence.</p>
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2">
-              <span className="text-xs font-black text-blue-600">STEP 02</span>
-              <h4 className="font-bold">Structured Database Sync</h4>
-              <p className="text-slate-500">Data automatically autosaves to draft records and syncs measurements.</p>
+            <div className="p-5 bg-[#F3E6D3] rounded-[20px] space-y-2 border border-[#E8DAC8]">
+              <span className="text-xs font-black text-[#C8452A]">STEP 02</span>
+              <h4 className="font-bold text-[#1F1F1F]">Database Sync</h4>
+              <p className="text-[#4A4540]">Data automatically autosaves to draft records and syncs measurements securely.</p>
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2">
-              <span className="text-xs font-black text-blue-600">STEP 03</span>
-              <h4 className="font-bold">Excel Engine Population</h4>
-              <p className="text-slate-500">Clones master template, embeds images into cells, and computes AQL results.</p>
+            <div className="p-5 bg-[#F3E6D3] rounded-[20px] space-y-2 border border-[#E8DAC8]">
+              <span className="text-xs font-black text-[#C8452A]">STEP 03</span>
+              <h4 className="font-bold text-[#1F1F1F]">Excel Population</h4>
+              <p className="text-[#4A4540]">Clones master template, embeds images into cells, and computes AQL results.</p>
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-2">
-              <span className="text-xs font-black text-blue-600">STEP 04</span>
-              <h4 className="font-bold">Instant Download</h4>
-              <p className="text-slate-500">QA downloads the completed `.xlsx` report (`Inspection_INS-2026-XXXXX_PO.xlsx`).</p>
+            <div className="p-5 bg-[#F3E6D3] rounded-[20px] space-y-2 border border-[#E8DAC8]">
+              <span className="text-xs font-black text-[#C8452A]">STEP 04</span>
+              <h4 className="font-bold text-[#1F1F1F]">Instant Download</h4>
+              <p className="text-[#4A4540]">QA auditor downloads the completed .xlsx report ready for brand delivery.</p>
             </div>
           </div>
         </div>

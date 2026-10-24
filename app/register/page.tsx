@@ -1,6 +1,7 @@
 /**
  * User Registration / Signup Page
  * Creates customer account via /api/auth/register
+ * Styled in Warm Cream (#FBF3E8) & Terracotta (#C8452A) design system.
  */
 "use client";
 
@@ -11,6 +12,7 @@ import { User, Lock, Mail, Phone, ArrowRight, AlertCircle, CheckCircle2 } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import MLogo from "@/components/ui/m-logo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -57,31 +59,38 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 pt-20">
+    <div className="min-h-screen bg-[#FBF3E8] text-[#1F1F1F] flex flex-col justify-center items-center p-4 py-16">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <div className="mx-auto w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg text-white mb-4">
-            <User className="w-8 h-8 text-emerald-400" />
-          </div>
-          <h1 className="text-2xl text-slate-900 font-light">Create MPSS Account</h1>
-          <p className="text-sm text-slate-500 font-light mt-1">Join to save custom apparel designs &amp; track orders</p>
+          <Link href="/" className="inline-block mb-4">
+            <div className="w-14 h-14 rounded-2xl border border-[#E8DAC8] bg-white p-1.5 flex items-center justify-center mx-auto shadow-xs hover:border-[#C8452A] transition-colors">
+              <MLogo size={40} strokeColor="#C8452A" />
+            </div>
+          </Link>
+          <p className="eyebrow-label mb-1">NEW CUSTOMER REGISTRATION</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F1F1F]">
+            Create MPSS <span className="text-[#C8452A]">Account</span>
+          </h1>
+          <p className="text-xs text-[#7A746E] font-medium mt-1">
+            Join to save custom apparel designs &amp; track quality inspections
+          </p>
         </div>
 
-        <Card className="shadow-xl border-slate-200">
-          <CardHeader className="space-y-1 pb-4 border-b border-slate-100">
-            <CardTitle className="text-lg font-normal text-slate-900">Registration Details</CardTitle>
-            <CardDescription className="font-light text-xs">Fill out your details to create a new customer account</CardDescription>
+        <Card className="rounded-[28px] border-[#E8DAC8] bg-white shadow-xs p-2 sm:p-4">
+          <CardHeader className="space-y-1 pb-4 border-b border-[#E8DAC8]">
+            <CardTitle className="text-base font-bold text-[#1F1F1F]">Registration Details</CardTitle>
+            <CardDescription className="text-xs text-[#7A746E]">Fill out your details to create a new customer account</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-600">
+              <div className="mb-4 p-3.5 bg-[#F7ECE9] border border-[#C8452A]/30 rounded-2xl flex items-center gap-2 text-xs text-[#C8452A] font-semibold">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
             {success && (
-              <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-xs text-emerald-700">
+              <div className="mb-4 p-3.5 bg-[#EFF3EB] border border-[#4A5B38]/30 rounded-2xl flex items-center gap-2 text-xs text-[#4A5B38] font-semibold">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>Account created successfully! Redirecting...</span>
               </div>
@@ -89,59 +98,59 @@ export default function RegisterPage() {
 
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-600 font-light">Full Name</label>
+                <label className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">Full Name</label>
                 <div className="relative">
-                  <User className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <User className="w-4 h-4 absolute left-3.5 top-3 text-[#7A746E]" />
                   <Input
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Rahul Sharma"
-                    className="pl-9 bg-white font-light text-sm"
+                    className="pl-10 bg-[#FBF3E8]/50 border-[#E8DAC8] rounded-full text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-600 font-light">Email Address</label>
+                <label className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">Email Address</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <Mail className="w-4 h-4 absolute left-3.5 top-3 text-[#7A746E]" />
                   <Input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="rahul@example.com"
-                    className="pl-9 bg-white font-light text-sm"
+                    className="pl-10 bg-[#FBF3E8]/50 border-[#E8DAC8] rounded-full text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-600 font-light">Phone Number</label>
+                <label className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">Phone Number</label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <Phone className="w-4 h-4 absolute left-3.5 top-3 text-[#7A746E]" />
                   <Input
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 9876543210"
-                    className="pl-9 bg-white font-light text-sm"
+                    className="pl-10 bg-[#FBF3E8]/50 border-[#E8DAC8] rounded-full text-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs text-slate-600 font-light">Password</label>
+                <label className="text-xs font-bold text-[#1F1F1F] uppercase tracking-wider">Password</label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                  <Lock className="w-4 h-4 absolute left-3.5 top-3 text-[#7A746E]" />
                   <Input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimum 6 characters"
-                    className="pl-9 bg-white font-light text-sm"
+                    className="pl-10 bg-[#FBF3E8]/50 border-[#E8DAC8] rounded-full text-sm"
                   />
                 </div>
               </div>
@@ -149,15 +158,15 @@ export default function RegisterPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-light py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-md transition-all"
+                className="btn-pill-primary w-full py-3 shadow-sm"
               >
                 {loading ? "Creating Account..." : "Create Account"}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 ml-1.5" />
               </Button>
 
-              <div className="text-center pt-2 text-xs text-slate-500 font-light">
+              <div className="text-center pt-2 text-xs text-[#7A746E]">
                 Already have an account?{" "}
-                <Link href="/login" className="text-emerald-700 hover:underline">
+                <Link href="/login" className="text-[#C8452A] font-bold hover:underline">
                   Sign In
                 </Link>
               </div>

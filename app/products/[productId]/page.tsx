@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RotateCcw } from "lucide-react";
+import { ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RotateCcw, Shirt } from "lucide-react";
 import { useCart, formatINR } from "@/lib/cart-context";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +47,7 @@ interface Product {
   ratingsAverage: number;
   ratingsCount: number;
   stock: number;
+  specifications?: Record<string, string>;
 }
 
 // ─── Component ────────────────────────────────────────────
@@ -131,47 +132,71 @@ export default function ProductDetailPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FBF3E8] text-[#1F1F1F]">
       {/* Toast */}
       {toastVisible && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-lg shadow-xl animate-slide-in text-sm font-light flex items-center gap-2">
-          <Check className="h-4 w-4 text-green-400" /> Added to cart
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1F1F1F] text-white px-5 py-3 rounded-full shadow-xl animate-slide-in text-sm font-medium flex items-center gap-2">
+          <Check className="h-4 w-4 text-[#C8452A]" /> Added to cart
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-gray-400 font-light mb-8">
-          <Link href="/products" className="hover:text-indigo-600 transition-colors">Products</Link>
+        <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-wider text-[#7A746E] mb-8">
+          <Link href="/products" className="hover:text-[#C8452A] transition-colors">Products</Link>
           <span>/</span>
-          <span className="text-gray-600">{product.name}</span>
+          <span className="text-[#1F1F1F]">{product.name}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image gallery */}
+          {/* Image gallery or placeholder */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-sm">
-              <img
-                src={product.images?.[activeImage]?.url || "/placeholder.svg"}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-              {product.badge && (
-                <Badge className="absolute top-4 left-4 font-light bg-indigo-600 text-white">{product.badge}</Badge>
-              )}
-              {discount > 0 && (
-                <Badge variant="destructive" className="absolute top-4 right-4 font-light">-{discount}%</Badge>
-              )}
-            </div>
-            {/* Thumbnail strip */}
-            {product.images?.length > 1 && (
+            {product.images && product.images.length > 0 && product.images[0]?.url && !product.images[0]?.url.includes("unsplash.com") ? (
+              <div className="relative aspect-square rounded-[24px] overflow-hidden bg-white border border-[#E8DAC8] shadow-sm">
+                <img
+                  src={product.images[activeImage]?.url}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+                {product.badge && (
+                  <span className="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-[#C8452A] text-white shadow-xs">
+                    {product.badge}
+                  </span>
+                )}
+                {discount > 0 && (
+                  <span className="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-[#1F1F1F] text-white">
+                    -{discount}%
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div className="relative aspect-square rounded-[24px] bg-[#F3E6D3]/60 border border-[#E8DAC8] flex flex-col items-center justify-center p-8 text-center shadow-xs">
+                {product.badge && (
+                  <span className="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-[#C8452A] text-white shadow-xs">
+                    {product.badge}
+                  </span>
+                )}
+                {discount > 0 && (
+                  <span className="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-[#1F1F1F] text-white">
+                    -{discount}%
+                  </span>
+                )}
+                <div className="w-20 h-20 rounded-3xl bg-white/90 border border-[#E8DAC8] flex items-center justify-center text-[#C8452A] shadow-xs mb-3">
+                  <Shirt className="h-10 w-10" />
+                </div>
+                <h3 className="text-base font-bold text-[#1F1F1F]">{product.name}</h3>
+                <p className="text-xs text-[#7A746E] mt-1">Photo available on request</p>
+              </div>
+            )}
+            {/* Thumbnail strip (only when valid user images exist) */}
+            {product.images && product.images.length > 1 && product.images[0]?.url && !product.images[0]?.url.includes("unsplash.com") && (
               <div className="flex gap-3">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors ${
-                      activeImage === i ? "border-indigo-600" : "border-transparent"
+                    className={`w-18 h-18 rounded-2xl overflow-hidden border-2 transition-all ${
+                      activeImage === i ? "border-[#C8452A] ring-2 ring-[#C8452A]/20 scale-105" : "border-[#E8DAC8] opacity-70 hover:opacity-100"
                     }`}
                   >
                     <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
@@ -184,32 +209,28 @@ export default function ProductDetailPage() {
           {/* Product info */}
           <div className="space-y-6">
             <div>
-              <p className="text-sm text-gray-400 font-light uppercase tracking-wider mb-1">{product.category}</p>
-              <h1 className="text-2xl sm:text-3xl font-light text-gray-900 mb-3">{product.name}</h1>
-              <div className="flex items-center gap-2 mb-4">
-                <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                <span className="text-sm text-gray-600 font-light">{product.ratingsAverage} ({product.ratingsCount} reviews)</span>
-              </div>
+              <p className="eyebrow-label mb-2">{product.category}</p>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1F1F1F] mb-3">{product.name}</h1>
             </div>
 
             {/* Price */}
             <div className="flex items-baseline gap-3">
-              <span className="text-2xl text-gray-900 font-light">{formatINR(product.price)}</span>
+              <span className="text-3xl font-extrabold text-[#1F1F1F]">{formatINR(product.price)}</span>
               {product.originalPrice && (
                 <>
-                  <span className="text-lg text-gray-400 line-through font-light">{formatINR(product.originalPrice)}</span>
-                  <Badge variant="secondary" className="font-light text-green-600">Save {discount}%</Badge>
+                  <span className="text-lg text-[#7A746E] line-through font-normal">{formatINR(product.originalPrice)}</span>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#EFF3EB] text-[#4A5B38]">Save {discount}%</span>
                 </>
               )}
             </div>
 
-            <p className="text-gray-600 font-light leading-relaxed">{product.description}</p>
+            <p className="text-[#4A4540] text-base leading-relaxed">{product.description}</p>
 
             {/* Color selection */}
             {product.colors?.length > 0 && (
               <div>
-                <p className="text-sm text-gray-500 font-light mb-3">Color: <span className="text-gray-900">{selectedColor}</span></p>
-                <div className="flex gap-2">
+                <p className="text-xs uppercase font-bold tracking-wider text-[#7A746E] mb-3">Color: <span className="text-[#1F1F1F] font-bold">{selectedColor}</span></p>
+                <div className="flex gap-2.5">
                   {product.colors.map((c, idx) => (
                     <button
                       key={c.name}
@@ -224,9 +245,9 @@ export default function ProductDetailPage() {
                         }
                       }}
                       disabled={!c.available}
-                      className={`w-8 h-8 rounded-full border-2 transition-all ${
-                        selectedColor === c.name ? "border-emerald-600 ring-2 ring-emerald-200 scale-110" : "border-gray-200"
-                      } ${!c.available ? "opacity-30 cursor-not-allowed" : "hover:scale-110"}`}
+                      className={`w-9 h-9 rounded-full border-2 transition-all ${
+                        selectedColor === c.name ? "border-[#C8452A] ring-2 ring-[#C8452A]/30 scale-110 shadow-xs" : "border-[#E8DAC8]"
+                      } ${!c.available ? "opacity-30 cursor-not-allowed" : "hover:scale-105"}`}
                       style={{ backgroundColor: c.hex }}
                       title={`${c.name} (Click to view photo)`}
                     />
@@ -238,17 +259,17 @@ export default function ProductDetailPage() {
             {/* Size selection */}
             {product.sizes?.length > 0 && (
               <div>
-                <p className="text-sm text-gray-500 font-light mb-3">Size: <span className="text-gray-900">{selectedSize}</span></p>
-                <div className="flex flex-wrap gap-2">
+                <p className="text-xs uppercase font-bold tracking-wider text-[#7A746E] mb-3">Size: <span className="text-[#1F1F1F] font-bold">{selectedSize}</span></p>
+                <div className="flex flex-wrap gap-2.5">
                   {product.sizes.map((s) => (
                     <button
                       key={s.name}
                       onClick={() => s.available && setSelectedSize(s.name)}
                       disabled={!s.available}
-                      className={`px-4 py-2 rounded-lg text-sm font-light border transition-all ${
+                      className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all ${
                         selectedSize === s.name
-                          ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                          : "border-gray-200 text-gray-600 hover:border-gray-300"
+                          ? "border-[#C8452A] bg-[#C8452A] text-white shadow-xs"
+                          : "border-[#E8DAC8] bg-[#FBF3E8] text-[#4A4540] hover:border-[#C8452A]"
                       } ${!s.available ? "opacity-30 cursor-not-allowed" : ""}`}
                     >
                       {s.name}
@@ -259,238 +280,103 @@ export default function ProductDetailPage() {
             )}
 
             {/* Quantity + Add to cart */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex items-center border rounded-lg overflow-hidden">
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <div className="inline-flex items-center border border-[#E8DAC8] bg-white rounded-full overflow-hidden w-fit">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors font-light"
+                  className="px-4 py-2.5 text-[#4A4540] hover:bg-[#F3E6D3] transition-colors font-bold"
                 >
                   −
                 </button>
-                <span className="px-6 py-2 text-center text-gray-900 font-light min-w-[3rem]">{quantity}</span>
+                <span className="px-5 py-2.5 text-center text-[#1F1F1F] font-bold min-w-[3rem]">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors font-light"
+                  className="px-4 py-2.5 text-[#4A4540] hover:bg-[#F3E6D3] transition-colors font-bold"
                 >
                   +
                 </button>
               </div>
               <Button
                 size="lg"
-                className="flex-1 font-light bg-slate-900 hover:bg-slate-800 text-white"
+                className="btn-pill-primary flex-1 py-3 text-sm"
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
               >
-                <ShoppingCart className="h-5 w-5 mr-2" />
+                <ShoppingCart className="h-4 w-4 mr-2" />
                 {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
-              <Button size="lg" variant="outline" className="font-light">
-                <Heart className="h-5 w-5" />
+              <Button size="lg" variant="outline" className="btn-pill-secondary px-4">
+                <Heart className="h-4 w-4 text-[#C8452A]" />
               </Button>
             </div>
 
-            {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t">
+            {/* Simple Product Highlights */}
+            <div className="pt-4 border-t border-[#E8DAC8] space-y-2">
+              <p className="text-xs uppercase font-bold tracking-wider text-[#7A746E]">Product Details</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-[#F3E6D3]/40 p-2.5 rounded-xl border border-[#E8DAC8]">
+                  <span className="text-[#7A746E] block text-[11px]">Material</span>
+                  <span className="font-bold text-[#1F1F1F]">
+                    {product.specifications?.material || (product.category === "Caps" ? "Cotton & Breathable Mesh" : "100% Cotton")}
+                  </span>
+                </div>
+                <div className="bg-[#F3E6D3]/40 p-2.5 rounded-xl border border-[#E8DAC8]">
+                  <span className="text-[#7A746E] block text-[11px]">Fit / Size</span>
+                  <span className="font-bold text-[#1F1F1F]">
+                    {product.specifications?.fit || (product.category === "Caps" ? "Adjustable Free Size" : "Regular Comfort Fit")}
+                  </span>
+                </div>
+                <div className="bg-[#F3E6D3]/40 p-2.5 rounded-xl border border-[#E8DAC8]">
+                  <span className="text-[#7A746E] block text-[11px]">Type</span>
+                  <span className="font-bold text-[#1F1F1F]">
+                    {product.specifications?.type || product.specifications?.visor || (product.category === "Caps" ? "Curved Visor Cap" : product.category?.includes("Uniform") ? "Workwear Uniform" : "Ribbed Round Neck")}
+                  </span>
+                </div>
+                <div className="bg-[#F3E6D3]/40 p-2.5 rounded-xl border border-[#E8DAC8]">
+                  <span className="text-[#7A746E] block text-[11px]">Origin</span>
+                  <span className="font-bold text-[#1F1F1F]">
+                    {product.specifications?.origin || "Tirupur, India"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Simple Trust Points */}
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-[#E8DAC8]">
               {[
-                { icon: Truck, label: "Free Shipping", sub: "Orders over ₹1,000" },
-                { icon: Shield, label: "Quality Assured", sub: "Inspection certified" },
-                { icon: RotateCcw, label: "Easy Returns", sub: "30-day return policy" },
+                { icon: Truck, label: "Tirupur Made", sub: "Direct from factory" },
+                { icon: Shield, label: "Quality Checked", sub: "Checked before shipping" },
+                { icon: RotateCcw, label: "Direct Support", sub: "Call & WhatsApp help" },
               ].map((item, i) => (
-                <div key={i} className="text-center">
-                  <item.icon className="h-5 w-5 mx-auto text-emerald-600 mb-1" />
-                  <p className="text-xs text-gray-900 font-light">{item.label}</p>
-                  <p className="text-xs text-gray-400 font-light">{item.sub}</p>
+                <div key={i} className="text-center p-3 rounded-2xl bg-[#F3E6D3]/40 border border-[#E8DAC8]">
+                  <item.icon className="h-5 w-5 mx-auto text-[#C8452A] mb-1.5" />
+                  <p className="text-xs text-[#1F1F1F] font-bold">{item.label}</p>
+                  <p className="text-[11px] text-[#7A746E]">{item.sub}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Customer Reviews & Comments Section */}
-        <ReviewsCommentsSection productId={product.id} />
-      </div>
-    </div>
-  );
-}
-
-// ─── Customer Reviews & Comments Section Component ───────
-
-function ReviewsCommentsSection({ productId }: { productId: string }) {
-  const [reviews, setReviews] = useState([
-    {
-      id: "rev-1",
-      author: "Amit Patel",
-      rating: 5,
-      date: "2 days ago",
-      comment: "Superb quality apparel! Fits perfectly and fabric feels very premium even after washing.",
-      helpfulCount: 14,
-      userVoted: false,
-    },
-    {
-      id: "rev-2",
-      author: "Priya Sharma",
-      rating: 4,
-      date: "1 week ago",
-      comment: "Loved the color accuracy! Switched photo to blue and the actual delivered item matches 100%.",
-      helpfulCount: 8,
-      userVoted: false,
-    },
-  ]);
-
-  const [newComment, setNewComment] = useState("");
-  const [newRating, setNewRating] = useState(5);
-  const [authorName, setAuthorName] = useState("");
-  const [submittedMessage, setSubmittedMessage] = useState("");
-
-  const handleVoteHelpful = (revId: string) => {
-    setReviews((prev) =>
-      prev.map((r) => {
-        if (r.id === revId) {
-          const updatedVoted = !r.userVoted;
-          return {
-            ...r,
-            userVoted: updatedVoted,
-            helpfulCount: updatedVoted ? r.helpfulCount + 1 : r.helpfulCount - 1,
-          };
-        }
-        return r;
-      })
-    );
-  };
-
-  const handleAddReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
-    const newRev = {
-      id: `rev-${Date.now()}`,
-      author: authorName.trim() || "Verified Buyer",
-      rating: newRating,
-      date: "Just now",
-      comment: newComment,
-      helpfulCount: 0,
-      userVoted: false,
-    };
-
-    setReviews([newRev, ...reviews]);
-    setNewComment("");
-    setAuthorName("");
-    setSubmittedMessage("Thank you for your helpful comment!");
-    setTimeout(() => setSubmittedMessage(""), 3000);
-  };
-
-  return (
-    <div className="mt-16 pt-10 border-t border-gray-200">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h2 className="text-2xl text-slate-900 font-light">Customer Reviews &amp; Comments</h2>
-          <p className="text-sm text-slate-500 font-light">Real feedback from verified buyers</p>
-        </div>
-        <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
-          <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-          <span className="text-lg text-slate-900 font-light">4.8 / 5.0</span>
-          <span className="text-xs text-slate-500 font-light">({reviews.length + 12} total reviews)</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Reviews List */}
-        <div className="lg:col-span-2 space-y-4">
-          {reviews.map((rev) => (
-            <div key={rev.id} className="bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-900">{rev.author}</span>
-                    <Badge variant="secondary" className="text-[10px] bg-emerald-100 text-emerald-800 border-0">Verified Buyer</Badge>
-                  </div>
-                  <div className="flex items-center gap-1 mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-3.5 h-3.5 ${i < rev.rating ? "text-amber-400 fill-amber-400" : "text-gray-300"}`}
-                      />
-                    ))}
-                    <span className="text-xs text-gray-400 ml-2 font-light">{rev.date}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleVoteHelpful(rev.id)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1.5 ${
-                    rev.userVoted
-                      ? "bg-emerald-50 border-emerald-300 text-emerald-700"
-                      : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  👍 Helpful ({rev.helpfulCount})
-                </button>
-              </div>
-
-              <p className="text-sm text-slate-700 font-light leading-relaxed">{rev.comment}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Add Review / Comment Form */}
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 h-fit space-y-4">
-          <h3 className="text-lg text-slate-900 font-light">Leave a Comment</h3>
-          <p className="text-xs text-slate-500 font-light">Share your honest experience to help other shoppers.</p>
-
-          {submittedMessage && (
-            <div className="p-3 bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-lg text-xs">
-              {submittedMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleAddReview} className="space-y-4">
-            <div>
-              <label className="text-xs text-slate-600 block mb-1">Your Rating</label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setNewRating(star)}
-                    className="p-1 hover:scale-110 transition-transform"
-                  >
-                    <Star
-                      className={`w-6 h-6 ${star <= newRating ? "text-amber-400 fill-amber-400" : "text-gray-300"}`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-600 block mb-1">Your Name</label>
-              <input
-                type="text"
-                value={authorName}
-                onChange={(e) => setAuthorName(e.target.value)}
-                placeholder="e.g. Rahul Sharma"
-                className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-600 block mb-1">Your Comment / Review</label>
-              <textarea
-                required
-                rows={3}
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="How was the fitting, fabric, and color quality?"
-                className="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-            </div>
-
-            <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-light text-sm py-2">
-              Submit Review
-            </Button>
-          </form>
+        {/* Direct Enquiry Box */}
+        <div className="mt-16 card-warm p-8 text-center max-w-2xl mx-auto space-y-3">
+          <h3 className="text-xl font-bold text-[#1F1F1F]">Need bulk quantity or custom logos?</h3>
+          <p className="text-sm text-[#4A4540] max-w-md mx-auto">
+            Contact our team in Tirupur for wholesale pricing, fabric GSM details, or custom embroidery.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-[#C8452A] text-white text-xs font-bold hover:bg-[#B03820] transition-colors shadow-xs"
+            >
+              For Enquiry →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+
+

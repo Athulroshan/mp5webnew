@@ -110,127 +110,131 @@ async function main() {
       specifications: JSON.stringify({ material: "100% Pique Cotton", care: "Machine Wash", origin: "India" })
     },
     {
-      name: "Premium Heavyweight Cotton Round Neck T-Shirt",
-      description: "240 GSM bio-washed 100% organic cotton round neck t-shirt. Features reinforced crew neck collar and drop shoulder relaxed fit.",
+      name: "Classic Cotton Round Neck T-Shirt",
+      description: "Soft 100% cotton plain round neck t-shirt. Comfortable regular fit for everyday wear and custom printing.",
       price: 599,
       originalPrice: 1299,
       category: "Round Neck T-Shirts",
       subcategory: "Round Neck",
       brand: "MPSS Basics",
       sku: "RND-HVY-003",
-      badge: "Trending",
+      badge: "Pure Cotton",
       stock: 110,
-      ratingsAverage: 4.8,
-      ratingsCount: 230,
+      ratingsAverage: 0,
+      ratingsCount: 0,
       isFeatured: true,
       images: JSON.stringify([
-        { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800", alt: "White Crew Neck T-Shirt" },
-        { url: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800", alt: "Grey Round Neck T-Shirt" },
-        { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800", alt: "Black Round Neck T-Shirt" }
+        { url: "/images/products/round-neck/round-neck-black.png", alt: "Black Round Neck T-Shirt" },
+        { url: "/images/products/round-neck/round-neck-beige.png", alt: "Beige Round Neck T-Shirt" },
+        { url: "/images/products/round-neck/round-neck-maroon.png", alt: "Maroon Round Neck T-Shirt" },
+        { url: "/images/products/round-neck/round-neck-white.png", alt: "White Round Neck T-Shirt" }
       ]),
       videos: JSON.stringify([]),
       colors: JSON.stringify([
-        { name: "Pure White", hex: "#ffffff", available: true, imageIndex: 0 },
-        { name: "Heather Grey", hex: "#94a3b8", available: true, imageIndex: 1 },
-        { name: "Jet Black", hex: "#000000", available: true, imageIndex: 2 }
+        { name: "Black", hex: "#111111", available: true, imageIndex: 0 },
+        { name: "Beige", hex: "#D4B996", available: true, imageIndex: 1 },
+        { name: "Maroon", hex: "#6B1724", available: true, imageIndex: 2 },
+        { name: "White", hex: "#FFFFFF", available: true, imageIndex: 3 }
       ]),
       sizes: JSON.stringify([
         { name: "S", available: true, stock: 30 },
         { name: "M", available: true, stock: 40 },
         { name: "L", available: true, stock: 40 }
       ]),
-      specifications: JSON.stringify({ material: "100% Bio-Washed Cotton", GSM: 240, origin: "India" })
+      specifications: JSON.stringify({ material: "100% Cotton", fit: "Regular Fit", origin: "Tirupur, India" })
     },
     {
-      name: "Classic Embroidered Adjustable Sport Cap",
-      description: "6-panel cotton twill cap with embroidered logo, pre-curved visor, and adjustable brass buckle closure. Breathable eyelets for ventilation.",
+      name: "Classic Adjustable Cap",
+      description: "Comfortable plain cap with breathable mesh and curved visor. Easy back strap adjustment for all head sizes. Ideal for everyday wear and custom embroidery.",
       price: 399,
       originalPrice: 899,
       category: "Caps",
       subcategory: "Baseball Cap",
       brand: "MPSS Headwear",
       sku: "CAP-TWL-004",
-      badge: "Under ₹399",
+      badge: "Adjustable",
       stock: 85,
-      ratingsAverage: 4.6,
-      ratingsCount: 96,
+      ratingsAverage: 0,
+      ratingsCount: 0,
       isFeatured: true,
       images: JSON.stringify([
-        { url: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800", alt: "Black Embroidered Cap" },
-        { url: "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?w=800", alt: "Navy Blue Sport Cap" },
-        { url: "https://images.unsplash.com/photo-1521369984125-a4de2c6be3a0?w=800", alt: "White Minimalist Cap" }
+        { url: "/images/products/caps/cap-black-white.png", alt: "Black & White Mesh Cap" },
+        { url: "/images/products/caps/cap-navy.png", alt: "Navy Blue Baseball Cap" },
+        { url: "/images/products/caps/cap-green-white.png", alt: "Green & White Mesh Cap" }
       ]),
       videos: JSON.stringify([]),
       colors: JSON.stringify([
-        { name: "Pitch Black", hex: "#18181b", available: true, imageIndex: 0 },
-        { name: "Deep Navy", hex: "#172554", available: true, imageIndex: 1 },
-        { name: "White Snow", hex: "#f8fafc", available: true, imageIndex: 2 }
+        { name: "Black & White", hex: "#111111", available: true, imageIndex: 0 },
+        { name: "Navy Blue", hex: "#1e3a8a", available: true, imageIndex: 1 },
+        { name: "Green & White", hex: "#15803d", available: true, imageIndex: 2 }
       ]),
       sizes: JSON.stringify([
         { name: "Free Size", available: true, stock: 85 }
       ]),
-      specifications: JSON.stringify({ material: "100% Cotton Twill", closure: "Adjustable Strap", origin: "India" })
+      specifications: JSON.stringify({ material: "Cotton & Breathable Mesh", fit: "Adjustable Strap", origin: "Tirupur, India" })
     },
     {
-      name: "Everyday Essential Normal T-Shirt",
-      description: "Super soft 180 GSM combed cotton regular fit normal t-shirt. Lightweight, breathable, and pre-shrunk for maximum everyday comfort.",
-      price: 499,
-      originalPrice: 999,
-      category: "Normal T-Shirts",
-      subcategory: "Casual T-Shirt",
-      brand: "MPSS Everyday",
-      sku: "NOR-TSH-005",
-      badge: "Essential",
-      stock: 120,
-      ratingsAverage: 4.7,
-      ratingsCount: 310,
-      isFeatured: true,
-      images: JSON.stringify([
-        { url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800", alt: "White Normal T-Shirt" },
-        { url: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800", alt: "Black Normal T-Shirt" },
-        { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800", alt: "Olive Green Normal T-Shirt" }
-      ]),
-      videos: JSON.stringify([]),
-      colors: JSON.stringify([
-        { name: "Clean White", hex: "#ffffff", available: true, imageIndex: 0 },
-        { name: "Classic Black", hex: "#000000", available: true, imageIndex: 1 },
-        { name: "Olive Green", hex: "#3f6212", available: true, imageIndex: 2 }
-      ]),
-      sizes: JSON.stringify([
-        { name: "S", available: true, stock: 30 },
-        { name: "M", available: true, stock: 45 },
-        { name: "L", available: true, stock: 45 }
-      ]),
-      specifications: JSON.stringify({ material: "100% Cotton", GSM: 180, origin: "India" })
-    },
-    {
-      name: "Fleece Heavyweight Pullover Hoodie",
-      description: "320 GSM brushed fleece lined pullover hoodie with kangaroo pouch pocket, double-lined hood, and matching drawstrings.",
+      name: "Heavy-Duty Industrial Worker Uniform",
+      description: "Tough industrial work uniform for factory, site, and maintenance workers. Durable fabric with reinforced stitching for safety, long wear, and all-day comfort.",
       price: 1199,
-      originalPrice: 2499,
-      category: "Hoodies",
-      subcategory: "Pullover Hoodie",
-      brand: "MPSS Winter",
-      sku: "HD-FLC-006",
-      badge: "Cozy Warmth",
-      stock: 50,
-      ratingsAverage: 4.9,
-      ratingsCount: 77,
+      originalPrice: 1999,
+      category: "Industry & Worker Uniforms",
+      subcategory: "Workwear & Coveralls",
+      brand: "MPSS Workwear",
+      sku: "IND-UNI-006",
+      badge: "Heavy Duty",
+      stock: 100,
+      ratingsAverage: 0,
+      ratingsCount: 0,
       isFeatured: true,
       images: JSON.stringify([
-        { url: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800", alt: "Black Pullover Hoodie" },
-        { url: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=800", alt: "Grey Fleece Hoodie" }
+        { url: "/images/products/work-uniforms/industrial-coverall.png", alt: "Safety Boiler Suit Coverall with Reflective Tapes" },
+        { url: "/images/products/work-uniforms/worker-shirt-pant-set.png", alt: "Industrial Worker Shirt and Trouser Set" }
       ]),
       videos: JSON.stringify([]),
       colors: JSON.stringify([
-        { name: "Obsidian Black", hex: "#0f172a", available: true, imageIndex: 0 },
-        { name: "Melange Grey", hex: "#64748b", available: true, imageIndex: 1 }
+        { name: "Safety Boiler Suit (Reflective)", hex: "#1e293b", available: true, imageIndex: 0 },
+        { name: "Navy Work Shirt & Pant Set", hex: "#172554", available: true, imageIndex: 1 }
       ]),
       sizes: JSON.stringify([
+        { name: "S", available: true, stock: 20 },
         { name: "M", available: true, stock: 25 },
-        { name: "L", available: true, stock: 25 }
+        { name: "L", available: true, stock: 25 },
+        { name: "XL", available: true, stock: 20 },
+        { name: "XXL", available: true, stock: 10 }
       ]),
-      specifications: JSON.stringify({ material: "Cotton Fleece", GSM: 320, origin: "India" })
+      specifications: JSON.stringify({ material: "Heavy-Duty Poly-Cotton Twill", fit: "Comfort Work Fit", type: "Industrial Workwear", origin: "Tirupur, India" })
+    },
+    {
+      name: "School Uniform Set",
+      description: "Comfortable and durable school uniform sets for boys and girls. Soft, wrinkle-resistant fabric made for daily school wear and sports activities.",
+      price: 899,
+      originalPrice: 1499,
+      category: "School Uniforms",
+      subcategory: "School Wear",
+      brand: "MPSS Schoolwear",
+      sku: "SCH-UNI-007",
+      badge: "School Wear",
+      stock: 250,
+      ratingsAverage: 0,
+      ratingsCount: 0,
+      isFeatured: true,
+      images: JSON.stringify([
+        { url: "/images/products/school-uniforms/school-regular-set.jpg", alt: "Classroom Uniform Set - Shirt & Trousers / Salwar & Waistcoat" },
+        { url: "/images/products/school-uniforms/school-sports-set.jpg", alt: "House Sports Uniform - Yellow Polo & Track Pants" }
+      ]),
+      videos: JSON.stringify([]),
+      colors: JSON.stringify([
+        { name: "Classroom Set (Sky Blue & Navy)", hex: "#38bdf8", available: true, imageIndex: 0 },
+        { name: "Sports PT Set (Yellow & Navy)", hex: "#eab308", available: true, imageIndex: 1 }
+      ]),
+      sizes: JSON.stringify([
+        { name: "Age 5-7 (Size 26-28)", available: true, stock: 60 },
+        { name: "Age 8-10 (Size 30-32)", available: true, stock: 70 },
+        { name: "Age 11-13 (Size 34-36)", available: true, stock: 60 },
+        { name: "Age 14+ (Size 38-40)", available: true, stock: 60 }
+      ]),
+      specifications: JSON.stringify({ material: "Breathable Poly-Cotton", fit: "Comfortable Regular School Fit", type: "School Uniform", origin: "Tirupur, India" })
     }
   ];
 

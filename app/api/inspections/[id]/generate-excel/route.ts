@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateInspectionExcelReport } from '@/lib/excel-generator';
 
-
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -41,14 +40,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       shipmentDetails: inspection.shipmentDetails ? JSON.parse(inspection.shipmentDetails) : {},
       cartonDetails: inspection.cartonDetails ? JSON.parse(inspection.cartonDetails) : [],
       capDetails: inspection.capDetails ? JSON.parse(inspection.capDetails) : [],
-      measurements: inspection.measurements.map((m) => ({
+      measurements: inspection.measurements.map((m: any) => ({
         measurementPoint: m.measurementPoint,
         specRequired: m.specRequired,
         tolerance: m.tolerance,
         actualValues: m.actualValues ? JSON.parse(m.actualValues) : [],
         result: m.result,
       })),
-      defects: inspection.defects.map((d) => ({
+      defects: inspection.defects.map((d: any) => ({
         defectCode: d.defectCode,
         description: d.description,
         location: d.location,
@@ -57,7 +56,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         photoUrl: d.photoUrl,
       })),
       currentVersion: inspection.currentVersion || 1,
-      photos: inspection.photos.map((p) => ({
+      photos: inspection.photos.map((p: any) => ({
         type: p.type as any,
         photoUrl: p.photoUrl,
         description: p.description,

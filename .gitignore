@@ -46,3 +46,5 @@ next-env.d.ts
 *.db.bak
 prisma/dev.db*
 prisma/sqlite_backup_data.json
+scratch/
+

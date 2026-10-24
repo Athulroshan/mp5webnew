@@ -1,0 +1,32 @@
+[
+  {
+    "id": "inq-1792744658091",
+    "name": "Rahul Verma",
+    "email": "rahul.verma@samplebrand.com",
+    "phone": "+91 9876543210",
+    "message": "Testing inquiry submission.\n\n[Estimated Order Quantity: 1,500 pieces]",
+    "service": "Bulk Garment Production",
+    "status": "new",
+    "createdAt": "2026-10-23T08:37:38.091Z"
+  },
+  {
+    "id": "inq-1792745174866",
+    "name": "John Doe",
+    "email": "john.doe@company.com",
+    "phone": "+91 9876543210",
+    "message": "Looking for 1000 premium organic cotton crewneck t-shirts in Tirupur.\n\n[Estimated Order Quantity: 1000 pcs]",
+    "service": "Bulk Garment Production",
+    "status": "new",
+    "createdAt": "2026-10-23T08:46:14.866Z"
+  },
+  {
+    "id": "inq-1792745400829",
+    "name": "Athul",
+    "email": "john.doe@company.com",
+    "phone": "+91 9876543210",
+    "message": "fjekjfsdjkfskjnf\n\n[Estimated Order Quantity: 1000 pcs]",
+    "service": "Private Label / OEM Manufacturing",
+    "status": "new",
+    "createdAt": "2026-10-23T08:50:00.829Z"
+  }
+]

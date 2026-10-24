@@ -445,53 +445,49 @@ export default function JournalPage() {
     filterPost(featuredArticle);
 
   return (
-    <div className="min-h-screen bg-slate-50/80 pt-16 sm:pt-20 pb-20 relative">
+    <div className="min-h-screen bg-[#FBF3E8] text-[#1F1F1F] pt-16 sm:pt-20 pb-20 relative">
       {/* ── FLOATING TOAST NOTIFICATION ───────────────────────────────── */}
       {notification && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl shadow-2xl border flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-300 text-xs font-bold ${
+          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-full shadow-lg border flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-300 text-xs font-bold ${
             notification.type === "success"
-              ? "bg-slate-900 text-white border-slate-800"
+              ? "bg-[#1F1F1F] text-white border-[#3A332D]"
               : "bg-red-600 text-white border-red-700"
           }`}
         >
           {notification.type === "success" ? (
-            <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
+            <CheckCircle className="h-4 w-4 text-[#C8452A] shrink-0" />
           ) : (
             <AlertTriangle className="h-4 w-4 text-white shrink-0" />
           )}
           <span>{notification.message}</span>
           <button
             onClick={() => setNotification(null)}
-            className="ml-2 text-slate-400 hover:text-white p-0.5"
+            className="ml-2 text-white/70 hover:text-white p-0.5"
           >
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
 
-      {/* ── EDITORIAL HERO HEADER (Article First, User Profile Compact) ────── */}
-      <section
-        className="relative py-12 sm:py-16 text-white overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(135deg, #090d16 0%, #1e1b4b 45%, #312e81 80%, #4338ca 100%)",
-        }}
-      >
-        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]" />
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-violet-600/30 blur-3xl pointer-events-none" />
+      {/* ── EDITORIAL HERO HEADER ────── */}
+      <section className="relative py-14 sm:py-20 bg-[#F3E6D3] border-b border-[#E8DAC8] text-[#1F1F1F] overflow-hidden">
+        <div
+          className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#EFE2CF] blur-3xl pointer-events-none"
+          aria-hidden="true"
+        />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
-              <Badge className="mb-3 bg-violet-500/25 text-violet-200 border border-violet-400/30 px-3.5 py-1 text-xs font-semibold rounded-full shadow-xs">
-                <Sparkles className="h-3.5 w-3.5 mr-1.5 text-violet-300" />
-                Apparel Manufacturing Knowledge Hub
-              </Badge>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight mb-2">
-                Garment Field Journal &amp; Technical Insights
+              <p className="eyebrow-label mb-2 flex items-center gap-2">
+                <Sparkles className="h-3.5 w-3.5 text-[#C8452A]" />
+                APPAREL SOURCING &amp; QA KNOWLEDGE HUB
+              </p>
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1F1F1F] leading-tight mb-3">
+                Garment Field Journal &amp; <span className="text-[#C8452A]">Technical Insights</span>
               </h1>
-              <p className="text-sm sm:text-base text-indigo-100/90 font-normal max-w-2xl leading-relaxed">
+              <p className="text-sm sm:text-base text-[#4A4540] font-normal max-w-2xl leading-relaxed">
                 Factory-tested QA guidelines, fabric performance benchmarks, 3D digital sampling tech, and auditor notes.
               </p>
             </div>
@@ -501,9 +497,9 @@ export default function JournalPage() {
               <Button
                 onClick={handleOpenWriteNew}
                 size="lg"
-                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold px-6 py-5 rounded-xl shadow-xl hover:shadow-violet-500/25 transition-all text-xs sm:text-sm flex items-center gap-2"
+                className="btn-pill-primary py-3.5 px-7 shadow-xs"
               >
-                <PenTool className="h-4 w-4 text-violet-200" />
+                <PenTool className="h-4 w-4 text-white" />
                 <span>Write Article</span>
               </Button>
             </div>
@@ -512,21 +508,21 @@ export default function JournalPage() {
       </section>
 
       {/* ── STICKY SEARCH & CATEGORY BAR ──────────────────────────────── */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-16 sm:top-20 z-30 shadow-xs">
+      <div className="bg-[#FBF3E8]/95 backdrop-blur-md border-b border-[#E8DAC8] sticky top-16 sm:top-20 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Category Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto no-scrollbar py-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1 shrink-0">
+          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto no-scrollbar py-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#7A746E] mr-1 shrink-0">
               Filter:
             </span>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   selectedCategory === cat
-                    ? "bg-violet-600 text-white shadow-xs scale-[1.02]"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200/80"
+                    ? "bg-[#C8452A] text-white shadow-xs"
+                    : "bg-[#F3E6D3] text-[#1F1F1F] hover:bg-[#EFE2CF]"
                 }`}
               >
                 {cat === "My Journals" ? (
@@ -543,12 +539,12 @@ export default function JournalPage() {
 
           {/* Search Input */}
           <div className="relative w-full sm:w-72 shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#7A746E]" />
             <Input
               placeholder="Search guides, topics or authors..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 text-xs border-slate-200 rounded-lg focus-visible:ring-violet-500 bg-slate-50/50"
+              className="pl-9 h-9 text-xs border-[#E8DAC8] rounded-full focus-visible:ring-[#C8452A] bg-white"
             />
             {searchQuery && (
               <button

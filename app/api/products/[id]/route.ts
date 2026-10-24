@@ -9,10 +9,13 @@ import { NextRequest } from "next/server";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+import localProducts from "@/data/products.json";
+
 // ─── GET: single product ─────────────────────────────────
 export async function GET(_request: NextRequest, context: RouteContext) {
+  const { id } = await context.params;
+
   try {
-    const { id } = await context.params;
     const product = await prisma.product.findUnique({
       where: { id },
       include: {
@@ -23,34 +26,43 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       },
     });
 
-    if (!product || !product.isActive) {
-      return Response.json(
-        { success: false, message: "Product not found" },
-        { status: 404 }
-      );
+    if (product && product.isActive) {
+      const parsed = {
+        ...product,
+        images: JSON.parse(product.images),
+        videos: JSON.parse(product.videos || "[]"),
+        colors: JSON.parse(product.colors),
+        sizes: JSON.parse(product.sizes),
+        tags: JSON.parse(product.tags),
+        features: JSON.parse(product.features),
+        specifications: JSON.parse(product.specifications),
+        discount: JSON.parse(product.discount),
+      };
+
+      return Response.json({ success: true, data: { product: parsed } });
     }
-
-    // Parse JSON fields
-    const parsed = {
-      ...product,
-      images: JSON.parse(product.images),
-      videos: JSON.parse(product.videos || "[]"),
-      colors: JSON.parse(product.colors),
-      sizes: JSON.parse(product.sizes),
-      tags: JSON.parse(product.tags),
-      features: JSON.parse(product.features),
-      specifications: JSON.parse(product.specifications),
-      discount: JSON.parse(product.discount),
-    };
-
-    return Response.json({ success: true, data: { product: parsed } });
   } catch (error) {
-    console.error("Get product error:", error);
-    return Response.json(
-      { success: false, message: "Server error" },
-      { status: 500 }
-    );
+    console.warn("Database error in single product GET, falling back to local products JSON:", error);
   }
+
+  // Fallback to local products
+  const localMatch = localProducts.find((p) => p.id === id);
+  if (localMatch) {
+    return Response.json({
+      success: true,
+      data: {
+        product: {
+          ...localMatch,
+          reviews: [],
+        },
+      },
+    });
+  }
+
+  return Response.json(
+    { success: false, message: "Product not found" },
+    { status: 404 }
+  );
 }
 
 // ─── PUT: update product (admin) ──────────────────────────
