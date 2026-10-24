@@ -292,48 +292,66 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
   // TAB 1: AUDIT STATE (Matching Audit sheet top-to-bottom)
   // ---------------------------------------------------------------------------
   const [productDescription, setProductDescription] = useState(
-    initialData?.productDescription || "Men Crew Neck 100% Cotton Polo T-Shirt"
+    initialData?.productDescription || ''
   );
   const [inspectionDate, setInspectionDate] = useState(
-    initialData?.inspectionDate || new Date().toISOString().split('T')[0]
+    initialData?.inspectionDate || ''
   );
   const [inspectionTeam, setInspectionTeam] = useState(
-    initialData?.agentName || 'My Profile Sourcing Solutions'
+    initialData?.agentName || ''
   );
-  const [customer, setCustomer] = useState(initialData?.buyerBrand || 'CAGI');
-  const [account, setAccount] = useState('MENS');
-  const [merchandiser, setMerchandiser] = useState('DHANAPAL');
-  const [factoryName, setFactoryName] = useState(initialData?.factoryName || 'JRP EXPORTS');
-  const [factoryLocation, setFactoryLocation] = useState('SEYENTHAMPALAYAM');
-  const [countryOfOrigin, setCountryOfOrigin] = useState('INDIA');
-  const [styleNumber, setStyleNumber] = useState(initialData?.styleNumber || 'YCAT0110');
-  const [poNumber, setPoNumber] = useState(initialData?.poNumber || '4500159665');
-  const [poQuantity, setPoQuantity] = useState(initialData?.poQuantity || 2600);
-  const [season, setSeason] = useState(initialData?.season || 'SUMMER');
-  const [colorWays, setColorWays] = useState('WHITE');
-  const [size, setSize] = useState('M,L,XL');
+  const [customer, setCustomer] = useState(initialData?.buyerBrand || '');
+  const [account, setAccount] = useState(initialData?.shipmentDetails?.account || '');
+  const [merchandiser, setMerchandiser] = useState(initialData?.shipmentDetails?.merchandiser || '');
+  const [factoryName, setFactoryName] = useState(initialData?.factoryName || '');
+  const [factoryLocation, setFactoryLocation] = useState(initialData?.shipmentDetails?.factoryLocation || '');
+  const [countryOfOrigin, setCountryOfOrigin] = useState(initialData?.shipmentDetails?.countryOfOrigin || '');
+  const [styleNumber, setStyleNumber] = useState(initialData?.styleNumber || '');
+  const [poNumber, setPoNumber] = useState(initialData?.poNumber || '');
+  const [poQuantity, setPoQuantity] = useState<number | string>(
+    initialData?.poQuantity ? initialData.poQuantity : ''
+  );
+  const [season, setSeason] = useState(initialData?.season || '');
+  const [colorWays, setColorWays] = useState(initialData?.shipmentDetails?.colorWays || '');
+  const [size, setSize] = useState(initialData?.shipmentDetails?.size || '');
   const [shipmentDate, setShipmentDate] = useState(
-    initialData?.inspectionDate || new Date().toISOString().split('T')[0]
+    initialData?.shipmentDetails?.shipmentDate || ''
   );
   const [inspectorName, setInspectorName] = useState(
-    initialData?.inspectorName || 'John Doe (QA Auditor)'
+    initialData?.inspectorName || ''
   );
 
   // Type Matrix & Shipping
-  const [sampleType, setSampleType] = useState('Fit / Size Set Sample');
-  const [inspectionType, setInspectionType] = useState('1st Batch | Pre-Final');
-  const [orderType, setOrderType] = useState('Replenishment');
-  const [shipBy, setShipBy] = useState<'Sea' | 'Air'>('Sea');
-  const [totalCartons, setTotalCartons] = useState(53);
-  const [qtyShipped, setQtyShipped] = useState(2592);
-  const [qtyAvailable, setQtyAvailable] = useState(2600);
+  const [sampleType, setSampleType] = useState(initialData?.shipmentDetails?.sampleType || '');
+  const [inspectionType, setInspectionType] = useState(initialData?.shipmentDetails?.inspectionType || '');
+  const [orderType, setOrderType] = useState(initialData?.shipmentDetails?.orderType || '');
+  const [shipBy, setShipBy] = useState<'Sea' | 'Air'>(initialData?.shipmentDetails?.shipBy || 'Sea');
+  const [totalCartons, setTotalCartons] = useState<number | string>(
+    initialData?.shipmentDetails?.totalCartons ? initialData.shipmentDetails.totalCartons : ''
+  );
+  const [qtyShipped, setQtyShipped] = useState<number | string>(
+    initialData?.shipmentDetails?.qtyShipped ? initialData.shipmentDetails.qtyShipped : ''
+  );
+  const [qtyAvailable, setQtyAvailable] = useState<number | string>(
+    initialData?.shipmentDetails?.qtyAvailable ? initialData.shipmentDetails.qtyAvailable : ''
+  );
 
   // AQL Settings
-  const [inspectionLevel, setInspectionLevel] = useState<'I' | 'II' | 'III'>('II');
-  const [inspectedQty, setInspectedQty] = useState(initialData?.inspectionQuantity || 125);
-  const [criticalAccept, setCriticalAccept] = useState('0');
-  const [majorAccept, setMajorAccept] = useState('7 / 8');
-  const [minorAccept, setMinorAccept] = useState('10 / 11');
+  const [inspectionLevel, setInspectionLevel] = useState<'I' | 'II' | 'III'>(
+    initialData?.shipmentDetails?.inspectionLevel || 'II'
+  );
+  const [inspectedQty, setInspectedQty] = useState<number | string>(
+    initialData?.inspectionQuantity ? initialData.inspectionQuantity : ''
+  );
+  const [criticalAccept, setCriticalAccept] = useState(
+    initialData?.shipmentDetails?.criticalAccept || ''
+  );
+  const [majorAccept, setMajorAccept] = useState(
+    initialData?.shipmentDetails?.majorAccept || ''
+  );
+  const [minorAccept, setMinorAccept] = useState(
+    initialData?.shipmentDetails?.minorAccept || ''
+  );
 
   // Items to Check (22 template questions)
   const [itemsToCheck, setItemsToCheck] = useState<any[]>(() => {
@@ -349,7 +367,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       id: i + 1,
       question: text,
       status: 'YES',
-      comment: 'Conforms to approved standard sample',
+      comment: '',
     }));
   });
 
@@ -358,7 +376,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     if (initialData?.defects && Array.isArray(initialData.defects) && initialData.defects.length > 0) {
       return initialData.defects.map((d: any, idx: number) => ({
         id: d.id || idx + 1,
-        colour: d.location || 'WHITE',
+        colour: d.location || '',
         defectCode: d.defectCode || `DEF-00${idx + 1}`,
         description: d.description || '',
         severity: (d.severity as any) || 'Major',
@@ -368,63 +386,85 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
         photoUrl: d.photoUrl || '',
       }));
     }
-    return [
-      {
-        id: 1,
-        colour: 'WHITE',
-        defectCode: 'DEF-001',
-        description: 'Poor pressing on XXL size need to correct before shipping the goods',
-        severity: 'Major',
-        quantity: 2,
-        commentsMpss: 'Re-press 100% of XXL',
-        commentsFactory: 'Agreed, in progress',
-      },
-      {
-        id: 2,
-        colour: 'WHITE',
-        defectCode: 'DEF-002',
-        description: 'Loose threads at bottom hem',
-        severity: 'Minor',
-        quantity: 3,
-        commentsMpss: 'Trim threads',
-        commentsFactory: 'Completed',
-      },
-    ];
+    return [];
   });
 
   // Production Status
-  const [cuttingPercent, setCuttingPercent] = useState('100%');
-  const [sewingPercent, setSewingPercent] = useState('100%');
-  const [trimmingPercent, setTrimmingPercent] = useState('100%');
-  const [packedPercent, setPackedPercent] = useState('95%');
-  const [totalCartonQty, setTotalCartonQty] = useState('53');
-  const [cartonsPacked, setCartonsPacked] = useState('53');
+  const [cuttingPercent, setCuttingPercent] = useState(
+    initialData?.shipmentDetails?.productionStatus?.cuttingPercent || ''
+  );
+  const [sewingPercent, setSewingPercent] = useState(
+    initialData?.shipmentDetails?.productionStatus?.sewingPercent || ''
+  );
+  const [trimmingPercent, setTrimmingPercent] = useState(
+    initialData?.shipmentDetails?.productionStatus?.trimmingPercent || ''
+  );
+  const [packedPercent, setPackedPercent] = useState(
+    initialData?.shipmentDetails?.productionStatus?.packedPercent || ''
+  );
+  const [totalCartonQty, setTotalCartonQty] = useState(
+    initialData?.shipmentDetails?.productionStatus?.totalCartonQty || ''
+  );
+  const [cartonsPacked, setCartonsPacked] = useState(
+    initialData?.shipmentDetails?.productionStatus?.cartonsPacked || ''
+  );
 
   // Comments
   const [comments, setComments] = useState(
-    initialData?.comments ||
-      'No critical defects found during visual and packing inspection. Order conforms to AQL 2.5 standards.'
+    initialData?.comments || ''
   );
 
   // Measurement Summary
-  const [measurementResult, setMeasurementResult] = useState<'PASS' | 'FAIL' | 'N/A'>('PASS');
-  const [measurementSampleSize, setMeasurementSampleSize] = useState('14');
-  const [maxAllowedPoints, setMaxAllowedPoints] = useState('5');
-  const [totalPomPoints, setTotalPomPoints] = useState('28');
-  const [defectivePointsFound, setDefectivePointsFound] = useState('0');
-  const [sampleSizeCriteria, setSampleSizeCriteria] = useState('ANSI/ASQ Z1.4');
-  const [measurementComment, setMeasurementComment] = useState('All POM points meet specified tolerances');
+  const mSummary = initialData?.shipmentDetails?.measurementSummary || {};
+  const [measurementResult, setMeasurementResult] = useState<'PASS' | 'FAIL' | 'N/A'>(
+    mSummary.result || 'PASS'
+  );
+  const [measurementSampleSize, setMeasurementSampleSize] = useState(
+    mSummary.sampleSize || ''
+  );
+  const [maxAllowedPoints, setMaxAllowedPoints] = useState(
+    mSummary.maxAllowedPoints || ''
+  );
+  const [totalPomPoints, setTotalPomPoints] = useState(
+    mSummary.totalPomPoints || ''
+  );
+  const [defectivePointsFound, setDefectivePointsFound] = useState(
+    mSummary.defectivePointsFound || ''
+  );
+  const [sampleSizeCriteria, setSampleSizeCriteria] = useState(
+    mSummary.sampleSizeCriteria || ''
+  );
+  const [measurementComment, setMeasurementComment] = useState(
+    mSummary.comment || ''
+  );
 
-  const [othersComment, setOthersComment] = useState('Goods are inspected under D65 artificial light table');
-  const [selectedCartons, setSelectedCartons] = useState('Ctn # 04, 12, 19, 28, 45, 52');
+  const [othersComment, setOthersComment] = useState(
+    initialData?.shipmentDetails?.othersComment || ''
+  );
+  const [selectedCartons, setSelectedCartons] = useState(
+    initialData?.shipmentDetails?.selectedCartons || ''
+  );
 
   // Signatures (3 required blocks)
-  const [mpssQcName, setMpssQcName] = useState(initialData?.inspectorName || 'John Doe');
-  const [mpssQcSignature, setMpssQcSignature] = useState('');
-  const [approvedByName, setApprovedByName] = useState('QA Manager');
-  const [approvedBySignature, setApprovedBySignature] = useState('');
-  const [supplierRepName, setSupplierRepName] = useState('Factory Representative');
-  const [supplierRepSignature, setSupplierRepSignature] = useState('');
+  const sigs = initialData?.shipmentDetails?.signatures || {};
+  const [mpssQcName, setMpssQcName] = useState(
+    sigs.mpssQcName || initialData?.inspectorName || ''
+  );
+  const [mpssQcSignature, setMpssQcSignature] = useState(
+    sigs.mpssQcSignature || ''
+  );
+  const [approvedByName, setApprovedByName] = useState(
+    sigs.approvedByName || ''
+  );
+  const [approvedBySignature, setApprovedBySignature] = useState(
+    sigs.approvedBySignature || ''
+  );
+  const [supplierRepName, setSupplierRepName] = useState(
+    sigs.supplierRepName || ''
+  );
+  const [supplierRepSignature, setSupplierRepSignature] = useState(
+    sigs.supplierRepSignature || ''
+  );
 
   // Result Override
   const [overrideResult, setOverrideResult] = useState<string>('');
@@ -434,31 +474,31 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
   // ---------------------------------------------------------------------------
   const pList = initialData?.shipmentDetails?.packingList || {};
   const [packingListDate, setPackingListDate] = useState(
-    pList.date || initialData?.inspectionDate || new Date().toISOString().split('T')[0]
+    pList.date || ''
   );
   const [packingListStyle, setPackingListStyle] = useState(
-    pList.style || initialData?.styleNumber || 'YCAT0110'
+    pList.style || initialData?.styleNumber || ''
   );
   const [packingListOrderQty, setPackingListOrderQty] = useState(
-    pList.orderQty || (initialData?.poQuantity ? String(initialData.poQuantity) : '2600')
+    pList.orderQty || (initialData?.poQuantity ? String(initialData.poQuantity) : '')
   );
   const [packingListFactory, setPackingListFactory] = useState(
-    pList.factory || initialData?.factoryName || 'JRP EXPORTS'
+    pList.factory || initialData?.factoryName || ''
   );
   const [packingListPo, setPackingListPo] = useState(
-    pList.po || initialData?.poNumber || '4500159665'
+    pList.po || initialData?.poNumber || ''
   );
   const [packingListCutQty, setPackingListCutQty] = useState(
-    pList.cutQty || '2600'
+    pList.cutQty || ''
   );
   const [packingListLocation, setPackingListLocation] = useState(
-    pList.location || 'SEYENTHAMPALAYAM'
+    pList.location || ''
   );
   const [packingListColours, setPackingListColours] = useState(
-    pList.colours || 'WHITE'
+    pList.colours || ''
   );
   const [packingListShipQty, setPackingListShipQty] = useState(
-    pList.shipQty || '2592'
+    pList.shipQty || ''
   );
   const [packingListPhotos, setPackingListPhotos] = useState<string[]>(() => {
     if (initialData?.photos && Array.isArray(initialData.photos)) {
@@ -479,19 +519,19 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
   // ---------------------------------------------------------------------------
   const mData = initialData?.shipmentDetails?.measure || {};
   const [measureFactory, setMeasureFactory] = useState(
-    mData.factory || initialData?.factoryName || 'JRP EXPORTS'
+    mData.factory || initialData?.factoryName || ''
   );
   const [measureVpnStyle, setMeasureVpnStyle] = useState(
-    mData.vpnStyle || initialData?.styleNumber || 'YCAT0110'
+    mData.vpnStyle || initialData?.styleNumber || ''
   );
   const [measurePo, setMeasurePo] = useState(
-    mData.purchaseOrder || initialData?.poNumber || '4500159665'
+    mData.purchaseOrder || initialData?.poNumber || ''
   );
   const [measureStyleDesc, setMeasureStyleDesc] = useState(
-    mData.styleDesc || initialData?.productDescription || 'Men Crew Neck 100% Cotton Polo T-Shirt'
+    mData.styleDesc || initialData?.productDescription || ''
   );
   const [measureAuditDate, setMeasureAuditDate] = useState(
-    mData.auditDate || initialData?.inspectionDate || new Date().toISOString().split('T')[0]
+    mData.auditDate || ''
   );
   const [measurePhotos, setMeasurePhotos] = useState<string[]>(() => {
     if (initialData?.photos && Array.isArray(initialData.photos)) {
@@ -520,7 +560,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       boxes.push({
         id: i + 1,
         photoUrl: existing[i]?.photoUrl || '',
-        name: existing[i]?.description || String(i + 1),
+        name: existing[i]?.description || '',
       });
     }
     return boxes;
@@ -539,7 +579,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       boxes.push({
         id: i + 1,
         photoUrl: existing[i]?.photoUrl || '',
-        name: existing[i]?.description || (defects[i]?.description ? defects[i].description : `Defect ${i + 1}`),
+        name: existing[i]?.description || '',
       });
     }
     return boxes;
@@ -560,21 +600,21 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     }
   }, [initialData]);
 
-  // Keep packing and measure pre-filled from Audit if empty
+  // Keep packing and measure pre-filled from Audit if empty and source value exists
   useEffect(() => {
-    if (!packingListStyle) setPackingListStyle(styleNumber);
-    if (!packingListFactory) setPackingListFactory(factoryName);
-    if (!packingListPo) setPackingListPo(poNumber);
-    if (!packingListOrderQty) setPackingListOrderQty(String(poQuantity));
-    if (!packingListLocation) setPackingListLocation(factoryLocation);
-    if (!packingListColours) setPackingListColours(colorWays);
-    if (!packingListDate) setPackingListDate(inspectionDate);
+    if (!packingListStyle && styleNumber) setPackingListStyle(styleNumber);
+    if (!packingListFactory && factoryName) setPackingListFactory(factoryName);
+    if (!packingListPo && poNumber) setPackingListPo(poNumber);
+    if (!packingListOrderQty && poQuantity) setPackingListOrderQty(String(poQuantity));
+    if (!packingListLocation && factoryLocation) setPackingListLocation(factoryLocation);
+    if (!packingListColours && colorWays) setPackingListColours(colorWays);
+    if (!packingListDate && inspectionDate) setPackingListDate(inspectionDate);
 
-    if (!measureFactory) setMeasureFactory(factoryName);
-    if (!measureVpnStyle) setMeasureVpnStyle(styleNumber);
-    if (!measurePo) setMeasurePo(poNumber);
-    if (!measureStyleDesc) setMeasureStyleDesc(productDescription);
-    if (!measureAuditDate) setMeasureAuditDate(inspectionDate);
+    if (!measureFactory && factoryName) setMeasureFactory(factoryName);
+    if (!measureVpnStyle && styleNumber) setMeasureVpnStyle(styleNumber);
+    if (!measurePo && poNumber) setMeasurePo(poNumber);
+    if (!measureStyleDesc && productDescription) setMeasureStyleDesc(productDescription);
+    if (!measureAuditDate && inspectionDate) setMeasureAuditDate(inspectionDate);
   }, [styleNumber, factoryName, poNumber, poQuantity, factoryLocation, colorWays, inspectionDate, productDescription]);
 
   // ---------------------------------------------------------------------------
@@ -837,9 +877,68 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     inspectionBoxes, defectBoxes, defects
   ]);
 
+  // Check if user has entered any content
+  const hasUserWrittenContent = Boolean(
+    (typeof poNumber === 'string' && poNumber.trim()) ||
+    (poQuantity !== '' && poQuantity !== 0) ||
+    (inspectedQty !== '' && inspectedQty !== 0) ||
+    (typeof factoryName === 'string' && factoryName.trim()) ||
+    (typeof inspectionTeam === 'string' && inspectionTeam.trim()) ||
+    (typeof season === 'string' && season.trim()) ||
+    (typeof customer === 'string' && customer.trim()) ||
+    (typeof account === 'string' && account.trim()) ||
+    (typeof merchandiser === 'string' && merchandiser.trim()) ||
+    (typeof factoryLocation === 'string' && factoryLocation.trim()) ||
+    (typeof countryOfOrigin === 'string' && countryOfOrigin.trim()) ||
+    (typeof styleNumber === 'string' && styleNumber.trim()) ||
+    (typeof productDescription === 'string' && productDescription.trim()) ||
+    (typeof inspectionDate === 'string' && inspectionDate.trim()) ||
+    (typeof colorWays === 'string' && colorWays.trim()) ||
+    (typeof size === 'string' && size.trim()) ||
+    (typeof shipmentDate === 'string' && shipmentDate.trim()) ||
+    (typeof inspectorName === 'string' && inspectorName.trim()) ||
+    (typeof sampleType === 'string' && sampleType.trim()) ||
+    (typeof inspectionType === 'string' && inspectionType.trim()) ||
+    (typeof orderType === 'string' && orderType.trim()) ||
+    (totalCartons !== '' && totalCartons !== 0) ||
+    (qtyShipped !== '' && qtyShipped !== 0) ||
+    (qtyAvailable !== '' && qtyAvailable !== 0) ||
+    (typeof comments === 'string' && comments.trim()) ||
+    (typeof othersComment === 'string' && othersComment.trim()) ||
+    (typeof selectedCartons === 'string' && selectedCartons.trim()) ||
+    (typeof cuttingPercent === 'string' && cuttingPercent.trim()) ||
+    (typeof sewingPercent === 'string' && sewingPercent.trim()) ||
+    (typeof trimmingPercent === 'string' && trimmingPercent.trim()) ||
+    (typeof packedPercent === 'string' && packedPercent.trim()) ||
+    (typeof totalCartonQty === 'string' && totalCartonQty.trim()) ||
+    (typeof cartonsPacked === 'string' && cartonsPacked.trim()) ||
+    (typeof measurementSampleSize === 'string' && measurementSampleSize.trim()) ||
+    (typeof maxAllowedPoints === 'string' && maxAllowedPoints.trim()) ||
+    (typeof totalPomPoints === 'string' && totalPomPoints.trim()) ||
+    (typeof defectivePointsFound === 'string' && defectivePointsFound.trim()) ||
+    (typeof sampleSizeCriteria === 'string' && sampleSizeCriteria.trim()) ||
+    (typeof measurementComment === 'string' && measurementComment.trim()) ||
+    (typeof mpssQcName === 'string' && mpssQcName.trim()) ||
+    (typeof mpssQcSignature === 'string' && mpssQcSignature.trim()) ||
+    (typeof approvedByName === 'string' && approvedByName.trim()) ||
+    (typeof approvedBySignature === 'string' && approvedBySignature.trim()) ||
+    (typeof supplierRepName === 'string' && supplierRepName.trim()) ||
+    (typeof supplierRepSignature === 'string' && supplierRepSignature.trim()) ||
+    (typeof overrideResult === 'string' && overrideResult.trim()) ||
+    defects.length > 0 ||
+    itemsToCheck.some((c) => c.comment && typeof c.comment === 'string' && c.comment.trim() !== '') ||
+    inspectionBoxes.some((b) => b.photoUrl) ||
+    defectBoxes.some((b) => b.photoUrl) ||
+    packingListPhotos.length > 0 ||
+    measurePhotos.length > 0
+  );
+
   // Debounced Autosave (3.5 seconds after editing)
   useEffect(() => {
     if (isClearedRef.current) return;
+    // Don't auto-save if starting fresh and user has not typed/written anything yet
+    if (!inspectionIdRef.current && !hasUserWrittenContent) return;
+
     const timer = setTimeout(() => {
       saveDraft();
     }, 3500);
@@ -850,7 +949,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     comments, itemsToCheck, shipBy, totalCartons, inspectionLevel, defects,
     cuttingPercent, sewingPercent, trimmingPercent, packedPercent, mpssQcSignature,
     approvedBySignature, supplierRepSignature, overrideResult, inspectionBoxes,
-    defectBoxes, packingListPhotos, measurePhotos, saveDraft
+    defectBoxes, packingListPhotos, measurePhotos, hasUserWrittenContent, saveDraft
   ]);
 
   const handleManualSave = () => {
@@ -865,7 +964,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
 
     // Tab 1: Audit
     setProductDescription('');
-    setInspectionDate(new Date().toISOString().split('T')[0]);
+    setInspectionDate('');
     setInspectionTeam('');
     setCustomer('');
     setAccount('');
@@ -875,7 +974,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     setCountryOfOrigin('');
     setStyleNumber('');
     setPoNumber('');
-    setPoQuantity(0);
+    setPoQuantity('');
     setSeason('');
     setColorWays('');
     setSize('');
@@ -887,14 +986,14 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
     setInspectionType('');
     setOrderType('');
     setShipBy('Sea');
-    setTotalCartons(0);
-    setQtyShipped(0);
-    setQtyAvailable(0);
+    setTotalCartons('');
+    setQtyShipped('');
+    setQtyAvailable('');
 
     // AQL Settings
     setInspectionLevel('II');
-    setInspectedQty(0);
-    setCriticalAccept('0');
+    setInspectedQty('');
+    setCriticalAccept('');
     setMajorAccept('');
     setMinorAccept('');
 
@@ -903,7 +1002,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       MASTER_22_CHECKPOINTS.map((text, i) => ({
         id: i + 1,
         question: text,
-        status: 'N/A',
+        status: 'YES',
         comment: '',
       }))
     );
@@ -969,7 +1068,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       Array.from({ length: 12 }, (_, i) => ({
         id: i + 1,
         photoUrl: '',
-        name: String(i + 1),
+        name: '',
       }))
     );
 
@@ -978,7 +1077,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       Array.from({ length: 8 }, (_, i) => ({
         id: i + 1,
         photoUrl: '',
-        name: `Defect ${i + 1}`,
+        name: '',
       }))
     );
   };
@@ -992,7 +1091,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       ...prev,
       {
         id: newId,
-        colour: colorWays || 'WHITE',
+        colour: colorWays || '',
         defectCode: `DEF-00${prev.length + 1}`,
         description: '',
         severity: 'Major',
@@ -1337,7 +1436,10 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                 <button
                   key={t.num}
                   type="button"
-                  onClick={() => setActiveTab(t.num)}
+                  onClick={() => {
+                    if (hasUserWrittenContent) saveDraft();
+                    setActiveTab(t.num);
+                  }}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
                     isActive
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
@@ -1380,6 +1482,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={productDescription}
                     onChange={(e) => setProductDescription(e.target.value)}
+                    placeholder="Enter product description"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-medium"
                   />
                 </div>
@@ -1398,6 +1501,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={inspectionTeam}
                     onChange={(e) => setInspectionTeam(e.target.value)}
+                    placeholder="Inspection team"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1408,6 +1512,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={customer}
                     onChange={(e) => setCustomer(e.target.value)}
+                    placeholder="Customer / Brand"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1417,6 +1522,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={account}
                     onChange={(e) => setAccount(e.target.value)}
+                    placeholder="Account"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1426,6 +1532,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={merchandiser}
                     onChange={(e) => setMerchandiser(e.target.value)}
+                    placeholder="Merchandiser"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1435,6 +1542,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={factoryName}
                     onChange={(e) => setFactoryName(e.target.value)}
+                    placeholder="Factory name"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold"
                   />
                 </div>
@@ -1445,6 +1553,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={factoryLocation}
                     onChange={(e) => setFactoryLocation(e.target.value)}
+                    placeholder="Factory location"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1454,6 +1563,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={countryOfOrigin}
                     onChange={(e) => setCountryOfOrigin(e.target.value)}
+                    placeholder="Country of origin"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1463,6 +1573,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={styleNumber}
                     onChange={(e) => setStyleNumber(e.target.value)}
+                    placeholder="Item / style number"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-blue-600 dark:text-blue-400"
                   />
                 </div>
@@ -1472,6 +1583,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={poNumber}
                     onChange={(e) => setPoNumber(e.target.value)}
+                    placeholder="PO number"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold"
                   />
                 </div>
@@ -1481,7 +1593,8 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                   <input
                     type="number"
                     value={poQuantity}
-                    onChange={(e) => setPoQuantity(Number(e.target.value) || 0)}
+                    onChange={(e) => setPoQuantity(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="Enter quantity"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold"
                   />
                 </div>
@@ -1491,6 +1604,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={season}
                     onChange={(e) => setSeason(e.target.value)}
+                    placeholder="Program / season"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1500,6 +1614,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={colorWays}
                     onChange={(e) => setColorWays(e.target.value)}
+                    placeholder="Colour ways"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1509,6 +1624,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={size}
                     onChange={(e) => setSize(e.target.value)}
+                    placeholder="Size breakdown"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1528,6 +1644,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={inspectorName}
                     onChange={(e) => setInspectorName(e.target.value)}
+                    placeholder="Inspector name"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold"
                   />
                 </div>
@@ -1552,11 +1669,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     onChange={(e) => setSampleType(e.target.value)}
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   >
-                    <option>Fit / Size Set Sample</option>
-                    <option>Pre-Production Sample</option>
-                    <option>TOP Sample</option>
-                    <option>Reference Sample</option>
-                    <option>Bulk Production</option>
+                    <option value="">Select Sample Type...</option>
+                    <option value="Fit / Size Set Sample">Fit / Size Set Sample</option>
+                    <option value="Pre-Production Sample">Pre-Production Sample</option>
+                    <option value="TOP Sample">TOP Sample</option>
+                    <option value="Reference Sample">Reference Sample</option>
+                    <option value="Bulk Production">Bulk Production</option>
                   </select>
                 </div>
                 <div>
@@ -1566,11 +1684,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     onChange={(e) => setInspectionType(e.target.value)}
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   >
-                    <option>1st Batch | Pre-Final</option>
-                    <option>In-line</option>
-                    <option>Final</option>
-                    <option>Re-Inline | Re-Final</option>
-                    <option>Pre-Shipment Inspection (FRI)</option>
+                    <option value="">Select Inspection Type...</option>
+                    <option value="1st Batch | Pre-Final">1st Batch | Pre-Final</option>
+                    <option value="In-line">In-line</option>
+                    <option value="Final">Final</option>
+                    <option value="Re-Inline | Re-Final">Re-Inline | Re-Final</option>
+                    <option value="Pre-Shipment Inspection (FRI)">Pre-Shipment Inspection (FRI)</option>
                   </select>
                 </div>
                 <div>
@@ -1580,9 +1699,10 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     onChange={(e) => setOrderType(e.target.value)}
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   >
-                    <option>Replenishment</option>
-                    <option>New Order</option>
-                    <option>Repeat Order</option>
+                    <option value="">Select Order Type...</option>
+                    <option value="Replenishment">Replenishment</option>
+                    <option value="New Order">New Order</option>
+                    <option value="Repeat Order">Repeat Order</option>
                   </select>
                 </div>
                 <div>
@@ -1616,7 +1736,8 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                   <input
                     type="number"
                     value={totalCartons}
-                    onChange={(e) => setTotalCartons(Number(e.target.value) || 0)}
+                    onChange={(e) => setTotalCartons(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="Total cartons"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1625,7 +1746,8 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                   <input
                     type="number"
                     value={qtyShipped}
-                    onChange={(e) => setQtyShipped(Number(e.target.value) || 0)}
+                    onChange={(e) => setQtyShipped(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="Qty shipped"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1634,7 +1756,8 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                   <input
                     type="number"
                     value={qtyAvailable}
-                    onChange={(e) => setQtyAvailable(Number(e.target.value) || 0)}
+                    onChange={(e) => setQtyAvailable(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="Qty available"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950"
                   />
                 </div>
@@ -1714,7 +1837,8 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                   <input
                     type="number"
                     value={inspectedQty}
-                    onChange={(e) => setInspectedQty(Number(e.target.value) || 0)}
+                    onChange={(e) => setInspectedQty(e.target.value === '' ? '' : Number(e.target.value))}
+                    placeholder="Inspected qty"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold"
                   />
                 </div>
@@ -1724,6 +1848,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={criticalAccept}
                     onChange={(e) => setCriticalAccept(e.target.value)}
+                    placeholder="0"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold"
                   />
                 </div>
@@ -1733,6 +1858,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={majorAccept}
                     onChange={(e) => setMajorAccept(e.target.value)}
+                    placeholder="Major limit"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold"
                   />
                 </div>
@@ -1742,6 +1868,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={minorAccept}
                     onChange={(e) => setMinorAccept(e.target.value)}
+                    placeholder="Minor limit"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold"
                   />
                 </div>
@@ -1813,7 +1940,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                               type="text"
                               value={d.colour || ''}
                               onChange={(e) => updateDefectRow(d.id, { colour: e.target.value })}
-                              placeholder="WHITE"
+                              placeholder="Colour"
                               className="w-20 p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
                             />
                           </td>
@@ -1822,7 +1949,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                               type="text"
                               value={d.defectCode || ''}
                               onChange={(e) => updateDefectRow(d.id, { defectCode: e.target.value })}
-                              placeholder="DEF-001"
+                              placeholder="Code"
                               className="w-24 p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-mono"
                             />
                           </td>
@@ -1989,6 +2116,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={cuttingPercent}
                     onChange={(e) => setCuttingPercent(e.target.value)}
+                    placeholder="e.g. 100%"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -1998,6 +2126,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={sewingPercent}
                     onChange={(e) => setSewingPercent(e.target.value)}
+                    placeholder="e.g. 100%"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2007,6 +2136,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={trimmingPercent}
                     onChange={(e) => setTrimmingPercent(e.target.value)}
+                    placeholder="e.g. 100%"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2016,6 +2146,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packedPercent}
                     onChange={(e) => setPackedPercent(e.target.value)}
+                    placeholder="e.g. 100%"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2025,6 +2156,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={totalCartonQty}
                     onChange={(e) => setTotalCartonQty(e.target.value)}
+                    placeholder="Carton qty"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2034,6 +2166,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={cartonsPacked}
                     onChange={(e) => setCartonsPacked(e.target.value)}
+                    placeholder="Packed"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2069,6 +2202,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={measurementSampleSize}
                     onChange={(e) => setMeasurementSampleSize(e.target.value)}
+                    placeholder="Sample size"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2078,6 +2212,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={maxAllowedPoints}
                     onChange={(e) => setMaxAllowedPoints(e.target.value)}
+                    placeholder="Allowed pts"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2087,6 +2222,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={totalPomPoints}
                     onChange={(e) => setTotalPomPoints(e.target.value)}
+                    placeholder="Total POM"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center"
                   />
                 </div>
@@ -2096,6 +2232,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={defectivePointsFound}
                     onChange={(e) => setDefectivePointsFound(e.target.value)}
+                    placeholder="Defects"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold text-center text-red-600"
                   />
                 </div>
@@ -2105,6 +2242,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={sampleSizeCriteria}
                     onChange={(e) => setSampleSizeCriteria(e.target.value)}
+                    placeholder="Criteria"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-semibold"
                   />
                 </div>
@@ -2116,6 +2254,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                   type="text"
                   value={measurementComment}
                   onChange={(e) => setMeasurementComment(e.target.value)}
+                  placeholder="Measurement comment"
                   className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs"
                 />
               </div>
@@ -2141,6 +2280,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={othersComment}
                     onChange={(e) => setOthersComment(e.target.value)}
+                    placeholder="Other notes"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs"
                   />
                 </div>
@@ -2150,6 +2290,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={selectedCartons}
                     onChange={(e) => setSelectedCartons(e.target.value)}
+                    placeholder="Selected carton numbers"
                     className="w-full mt-1 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-mono"
                   />
                 </div>
@@ -2177,6 +2318,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                       type="text"
                       value={mpssQcName}
                       onChange={(e) => setMpssQcName(e.target.value)}
+                      placeholder="Auditor name"
                       className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold"
                     />
                   </div>
@@ -2195,6 +2337,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                       type="text"
                       value={approvedByName}
                       onChange={(e) => setApprovedByName(e.target.value)}
+                      placeholder="Approver name"
                       className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold"
                     />
                   </div>
@@ -2213,6 +2356,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                       type="text"
                       value={supplierRepName}
                       onChange={(e) => setSupplierRepName(e.target.value)}
+                      placeholder="Supplier rep name"
                       className="w-full mt-1 p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold"
                     />
                   </div>
@@ -2293,7 +2437,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListStyle}
                     onChange={(e) => setPackingListStyle(e.target.value)}
-                    placeholder="e.g. YCAT0110"
+                    placeholder="Style #"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2305,7 +2449,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListOrderQty}
                     onChange={(e) => setPackingListOrderQty(e.target.value)}
-                    placeholder="e.g. 2600"
+                    placeholder="Order Qty"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2317,7 +2461,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListFactory}
                     onChange={(e) => setPackingListFactory(e.target.value)}
-                    placeholder="e.g. JRP EXPORTS"
+                    placeholder="Factory"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2329,7 +2473,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListPo}
                     onChange={(e) => setPackingListPo(e.target.value)}
-                    placeholder="e.g. 4500159665"
+                    placeholder="PO #"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2341,7 +2485,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListCutQty}
                     onChange={(e) => setPackingListCutQty(e.target.value)}
-                    placeholder="e.g. 2600"
+                    placeholder="Cut Qty"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2353,7 +2497,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListLocation}
                     onChange={(e) => setPackingListLocation(e.target.value)}
-                    placeholder="e.g. SEYENTHAMPALAYAM"
+                    placeholder="Location"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2365,7 +2509,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListColours}
                     onChange={(e) => setPackingListColours(e.target.value)}
-                    placeholder="e.g. WHITE"
+                    placeholder="Colours"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2377,7 +2521,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={packingListShipQty}
                     onChange={(e) => setPackingListShipQty(e.target.value)}
-                    placeholder="e.g. 2592"
+                    placeholder="Ship Qty"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-blue-500 transition"
                   />
                 </div>
@@ -2562,7 +2706,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={measureFactory}
                     onChange={(e) => setMeasureFactory(e.target.value)}
-                    placeholder="e.g. JRP EXPORTS"
+                    placeholder="Factory"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-indigo-500 transition"
                   />
                 </div>
@@ -2574,7 +2718,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={measureVpnStyle}
                     onChange={(e) => setMeasureVpnStyle(e.target.value)}
-                    placeholder="e.g. YCAT0110"
+                    placeholder="VPN (Style)"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-indigo-500 transition"
                   />
                 </div>
@@ -2586,7 +2730,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={measurePo}
                     onChange={(e) => setMeasurePo(e.target.value)}
-                    placeholder="e.g. 4500159665"
+                    placeholder="Purchase Order"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-indigo-500 transition"
                   />
                 </div>
@@ -2598,7 +2742,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                     type="text"
                     value={measureStyleDesc}
                     onChange={(e) => setMeasureStyleDesc(e.target.value)}
-                    placeholder="e.g. Men Crew Neck 100% Cotton Polo T-Shirt"
+                    placeholder="Style Description"
                     className="w-full mt-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs font-semibold focus:outline-none focus:border-indigo-500 transition"
                   />
                 </div>
@@ -3100,7 +3244,10 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
             {activeTab < 5 ? (
               <button
                 type="button"
-                onClick={() => setActiveTab((p) => Math.min(5, p + 1))}
+                onClick={() => {
+                  if (hasUserWrittenContent) saveDraft();
+                  setActiveTab((p) => Math.min(5, p + 1));
+                }}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-blue-500/20 cursor-pointer"
               >
                 <span>Next</span>
