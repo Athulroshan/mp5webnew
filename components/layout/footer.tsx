@@ -64,12 +64,12 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="text-[#1F1F1F] font-bold uppercase tracking-wider text-xs">APPAREL PRODUCTS</h4>
             <ul className="space-y-2 text-[#4A4540] font-medium">
-              <li><Link href="/products?category=Sportswear" className="hover:text-[#C8452A] transition-colors">Sportswear</Link></li>
-              <li><Link href="/products?category=Caps" className="hover:text-[#C8452A] transition-colors">Caps &amp; Headwear</Link></li>
               <li><Link href="/products?category=Round+Neck+T-Shirts" className="hover:text-[#C8452A] transition-colors">Round Neck T-Shirts</Link></li>
               <li><Link href="/products?category=Polo+T-Shirts" className="hover:text-[#C8452A] transition-colors">Polo T-Shirts</Link></li>
-              <li><Link href="/products?category=Normal+T-Shirts" className="hover:text-[#C8452A] transition-colors">Normal T-Shirts</Link></li>
-              <li><Link href="/products?category=Hoodies" className="hover:text-[#C8452A] transition-colors">Hoodies &amp; Jackets</Link></li>
+              <li><Link href="/products?category=Caps" className="hover:text-[#C8452A] transition-colors">Caps &amp; Headwear</Link></li>
+              <li><Link href="/products?category=Industry+%26+Worker+Uniforms" className="hover:text-[#C8452A] transition-colors">Industry &amp; Worker Uniforms</Link></li>
+              <li><Link href="/products?category=School+Uniforms" className="hover:text-[#C8452A] transition-colors">School Uniforms</Link></li>
+              <li><Link href="/products?category=Shirts" className="hover:text-[#C8452A] transition-colors">Shirts</Link></li>
               <li><Link href="/customization" className="hover:text-[#C8452A] transition-colors font-semibold text-[#C8452A]">3D Custom Studio</Link></li>
             </ul>
           </div>
@@ -104,14 +104,14 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/9197090987121?text=Hello%20MPSS%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
+                  href="https://wa.me/919790987121?text=Hello%20MPSS%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-[#4A5B38] flex items-center gap-1.5 text-xs text-[#7A746E] transition-colors"
                   title="Open secondary WhatsApp chat"
                 >
                   <Phone className="w-3.5 h-3.5 text-[#4A5B38] shrink-0" />
-                  <span>97090987121 (Alt)</span>
+                  <span>9790987121 (Alt)</span>
                 </a>
               </li>
               <li>

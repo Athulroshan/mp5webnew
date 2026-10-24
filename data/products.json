@@ -156,8 +156,8 @@
   },
   {
     "id": "prod-polo-1",
-    "name": "Premium Pique Knit Polo T-Shirt",
-    "description": "Durable 220 GSM honeycomb pique cotton with mother-of-pearl buttons and shape-retaining flat knit collar.",
+    "name": "Classic Cotton Polo T-Shirt",
+    "description": "Comfortable cotton pique polo t-shirt with ribbed collar and button placket. Soft, durable fabric suitable for daily wear, office uniforms, and custom logo embroidery.",
     "price": 699,
     "originalPrice": 1199,
     "category": "Polo T-Shirts",
@@ -167,22 +167,38 @@
     "ratingsCount": 0,
     "isActive": true,
     "createdAt": "2026-10-19T10:00:00.000Z",
-    "images": [],
+    "images": [
+      {
+        "url": "/images/products/polo/polo-white.png",
+        "alt": "White Polo T-Shirt"
+      },
+      {
+        "url": "/images/products/polo/polo-black.png",
+        "alt": "Black Polo T-Shirt"
+      },
+      {
+        "url": "/images/products/polo/polo-red.png",
+        "alt": "Red Polo T-Shirt"
+      }
+    ],
     "colors": [
       {
-        "name": "Royal Blue",
-        "hex": "#2563eb",
-        "available": true
+        "name": "White",
+        "hex": "#FFFFFF",
+        "available": true,
+        "imageIndex": 0
       },
       {
-        "name": "Jet Black",
+        "name": "Black",
         "hex": "#111111",
-        "available": true
+        "available": true,
+        "imageIndex": 1
       },
       {
-        "name": "Forest Green",
-        "hex": "#14532d",
-        "available": true
+        "name": "Red",
+        "hex": "#C81D25",
+        "available": true,
+        "imageIndex": 2
       }
     ],
     "sizes": [

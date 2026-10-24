@@ -43,9 +43,9 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Secondary Contact & WhatsApp",
-    info: "+91 97090987121",
+    info: "+91 9790987121",
     subtitle: "Click to chat on WhatsApp • Alternate contact line",
-    href: "https://wa.me/9197090987121?text=Hello%20MPSS%2C%20I%20would%20like%20to%20inquire%20about%20your%20apparel%20and%20quality%20inspection%20services.",
+    href: "https://wa.me/919790987121?text=Hello%20MPSS%2C%20I%20would%20like%20to%20inquire%20about%20your%20apparel%20and%20quality%20inspection%20services.",
     badge: "WhatsApp",
     color: "text-[#4A5B38]",
     bgColor: "bg-[#EFF3EB]",

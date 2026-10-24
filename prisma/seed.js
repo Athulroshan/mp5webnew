@@ -41,45 +41,11 @@ async function main() {
 
   console.log(`👤 Created Users: Admin (${admin.email}), Customer (${customer.email})`);
 
-  // 2. Create Products focused on Apparel: Sportswear, Caps, Round Neck, Polo, Normal T-Shirts
+  // 2. Create Products focused on Apparel: Caps, Round Neck, Polo, School Uniforms, Industrial Uniforms
   const productsData = [
     {
-      name: "Pro Dry-Fit Athletic Sportswear Set",
-      description: "Moisture-wicking breathable dry-fit performance sportswear set including athletic compression t-shirt and track pants. Engineered for intense gym workouts and outdoor sports.",
-      price: 1299,
-      originalPrice: 2999,
-      category: "Sportswear",
-      subcategory: "Tracksuit",
-      brand: "MPSS Athletics",
-      sku: "SPT-DRY-001",
-      badge: "Best Seller",
-      stock: 65,
-      ratingsAverage: 4.9,
-      ratingsCount: 184,
-      isFeatured: true,
-      images: JSON.stringify([
-        { url: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800", alt: "Black Gym Sportswear" },
-        { url: "https://images.unsplash.com/photo-1506152983158-b4a74a01c721?w=800", alt: "Red Performance Tracksuit" },
-        { url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800", alt: "Blue Athletic Fit" }
-      ]),
-      videos: JSON.stringify([
-        { url: "https://assets.mixkit.co/videos/preview/mixkit-athlete-tying-running-shoes-41557-large.mp4", title: "Flex & Stretch Test", thumbnail: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=400" }
-      ]),
-      colors: JSON.stringify([
-        { name: "Stealth Black", hex: "#18181b", available: true, imageIndex: 0 },
-        { name: "Crimson Red", hex: "#dc2626", available: true, imageIndex: 1 },
-        { name: "Royal Blue", hex: "#2563eb", available: true, imageIndex: 2 }
-      ]),
-      sizes: JSON.stringify([
-        { name: "S", available: true, stock: 15 },
-        { name: "M", available: true, stock: 25 },
-        { name: "L", available: true, stock: 25 }
-      ]),
-      specifications: JSON.stringify({ material: "Polyester Spandex Blend", care: "Machine Wash Cold", origin: "India" })
-    },
-    {
-      name: "Classic Pique Cotton Polo T-Shirt",
-      description: "100% Combed Pique Cotton polo t-shirt with ribbed collar, 2-button placket, and side slits. Smart casual staple for work or weekend outings.",
+      name: "Classic Cotton Polo T-Shirt",
+      description: "Comfortable cotton pique polo t-shirt with ribbed collar and button placket. Soft, durable fabric suitable for daily wear, office uniforms, and custom logo embroidery.",
       price: 799,
       originalPrice: 1799,
       category: "Polo T-Shirts",
@@ -92,15 +58,15 @@ async function main() {
       ratingsCount: 142,
       isFeatured: true,
       images: JSON.stringify([
-        { url: "https://images.unsplash.com/photo-1625910513413-fe01f114c000?w=800", alt: "Navy Polo T-Shirt" },
-        { url: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800", alt: "White Polo T-Shirt" },
-        { url: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800", alt: "Black Polo T-Shirt" }
+        { url: "/images/products/polo/polo-white.png", alt: "White Polo T-Shirt" },
+        { url: "/images/products/polo/polo-black.png", alt: "Black Polo T-Shirt" },
+        { url: "/images/products/polo/polo-red.png", alt: "Red Polo T-Shirt" }
       ]),
       videos: JSON.stringify([]),
       colors: JSON.stringify([
-        { name: "Navy Blue", hex: "#1e3a8a", available: true, imageIndex: 0 },
-        { name: "Crisp White", hex: "#f8fafc", available: true, imageIndex: 1 },
-        { name: "Charcoal Black", hex: "#0f172a", available: true, imageIndex: 2 }
+        { name: "White", hex: "#FFFFFF", available: true, imageIndex: 0 },
+        { name: "Black", hex: "#111111", available: true, imageIndex: 1 },
+        { name: "Red", hex: "#C81D25", available: true, imageIndex: 2 }
       ]),
       sizes: JSON.stringify([
         { name: "S", available: true, stock: 20 },
