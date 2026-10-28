@@ -91,7 +91,6 @@ const categories = [
   { label: "Caps", value: "Caps" },
   { label: "Industry & Worker Uniforms", value: "Industry & Worker Uniforms" },
   { label: "School Uniforms", value: "School Uniforms" },
-  { label: "Shirts", value: "Shirts" },
 ];
 
 const sortOptions = [

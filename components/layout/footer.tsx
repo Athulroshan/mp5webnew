@@ -69,7 +69,6 @@ export default function Footer() {
               <li><Link href="/products?category=Caps" className="hover:text-[#C8452A] transition-colors">Caps &amp; Headwear</Link></li>
               <li><Link href="/products?category=Industry+%26+Worker+Uniforms" className="hover:text-[#C8452A] transition-colors">Industry &amp; Worker Uniforms</Link></li>
               <li><Link href="/products?category=School+Uniforms" className="hover:text-[#C8452A] transition-colors">School Uniforms</Link></li>
-              <li><Link href="/products?category=Shirts" className="hover:text-[#C8452A] transition-colors">Shirts</Link></li>
               <li><Link href="/customization" className="hover:text-[#C8452A] transition-colors font-semibold text-[#C8452A]">3D Custom Studio</Link></li>
             </ul>
           </div>
