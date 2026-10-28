@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   FileSpreadsheet,
   Plus,
@@ -18,12 +19,44 @@ import {
   Layers,
   ArrowRight,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 export default function InspectionsDashboard() {
+  const router = useRouter();
   const [inspections, setInspections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'completed'>('all');
+
+  // Start Inspection Dialog State
+  const [startDialogOpen, setStartDialogOpen] = useState(false);
+  const [newReportNumber, setNewReportNumber] = useState('');
+  const [dialogError, setDialogError] = useState('');
+
+  const handleOpenStartDialog = () => {
+    setNewReportNumber('');
+    setDialogError('');
+    setStartDialogOpen(true);
+  };
+
+  const handleStartInspection = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newReportNumber.trim();
+    if (!trimmed) {
+      setDialogError('Please enter a valid report number.');
+      return;
+    }
+    setStartDialogOpen(false);
+    router.push(`/inspections/new?reportNumber=${encodeURIComponent(trimmed)}`);
+  };
 
   const fetchInspections = async () => {
     setLoading(true);
@@ -95,13 +128,14 @@ export default function InspectionsDashboard() {
             </p>
           </div>
 
-          <Link
-            href="/inspections/new"
-            className="btn-pill-primary shrink-0 py-3.5 px-7"
+          <button
+            type="button"
+            onClick={handleOpenStartDialog}
+            className="btn-pill-primary shrink-0 py-3.5 px-7 cursor-pointer flex items-center justify-center gap-1"
           >
             <Plus className="w-4 h-4 mr-1" />
             <span>START NEW INSPECTION</span>
-          </Link>
+          </button>
         </div>
 
         {/* Stats Metrics */}
@@ -201,12 +235,13 @@ export default function InspectionsDashboard() {
             <p className="text-xs text-[#7A746E] max-w-sm mt-1 mb-6">
               Get started by creating a new inspection draft. All data will be mapped to your master Excel report.
             </p>
-            <Link
-              href="/inspections/new"
-              className="btn-pill-primary text-xs py-2.5 px-6"
+            <button
+              type="button"
+              onClick={handleOpenStartDialog}
+              className="btn-pill-primary text-xs py-2.5 px-6 cursor-pointer"
             >
               Start New Inspection
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -402,6 +437,68 @@ export default function InspectionsDashboard() {
           </div>
         </div>
       )}
+
+      {/* ── START NEW INSPECTION MODAL (REPORT NUMBER) ───────────────────────── */}
+      <Dialog open={startDialogOpen} onOpenChange={setStartDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white p-6 sm:p-7 rounded-[28px] shadow-2xl border border-[#E8DAC8]">
+          <DialogHeader>
+            <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-[#C8452A] mb-1">
+              <FileSpreadsheet className="w-4 h-4 text-[#C8452A]" />
+              <span>New QA Inspection Audit</span>
+            </div>
+            <DialogTitle className="text-xl font-extrabold text-[#1F1F1F]">
+              Enter Report Number
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#4A4540] mt-1 leading-relaxed">
+              Please enter the unique Report Number to begin. This identifier will appear at the front of the audit page and be mapped into your master report.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleStartInspection} className="mt-5 space-y-4">
+            <div>
+              <label htmlFor="newReportNumberInput" className="block text-xs font-bold text-[#1F1F1F] mb-1.5">
+                Report Number <span className="text-[#C8452A]">*</span>
+              </label>
+              <input
+                id="newReportNumberInput"
+                type="text"
+                value={newReportNumber}
+                onChange={(e) => {
+                  setNewReportNumber(e.target.value);
+                  if (dialogError) setDialogError('');
+                }}
+                placeholder="e.g. FI_MPSS_1314"
+                autoFocus
+                className="w-full text-sm px-4 py-3 bg-[#FBF3E8]/60 border border-[#E8DAC8] rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#C8452A] font-semibold text-[#1F1F1F] placeholder:text-[#7A746E]/60 transition"
+              />
+              {dialogError && (
+                <p className="text-xs text-red-600 mt-1.5 font-medium flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <span>{dialogError}</span>
+                </p>
+              )}
+            </div>
+
+            <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStartDialogOpen(false)}
+                className="rounded-full px-5 py-2.5 text-xs font-bold text-[#4A4540] border-[#E8DAC8] hover:bg-[#F3E6D3] cursor-pointer"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="btn-pill-primary text-xs py-2.5 px-6 rounded-full cursor-pointer flex items-center gap-1.5 shadow-sm"
+              >
+                <span>Start Inspection</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   FileSpreadsheet,
   CheckCircle,
@@ -246,6 +246,8 @@ function SignaturePad({
 
 export function QAStepperWizard({ initialData }: QAStepperProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryReportNumber = searchParams ? searchParams.get('reportNumber') : null;
 
   // Active Tab: 1 = Audit, 2 = Packing list, 3 = Measure, 4 = Inspection photos, 5 = Defects photos
   const [activeTab, setActiveTab] = useState<number>(1);
@@ -257,8 +259,13 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
   // Primary identifiers
   const [inspectionId, setInspectionId] = useState<string>(initialData?.id || '');
   const [inspectionNumber, setInspectionNumber] = useState<string>(
-    initialData?.inspectionNumber || 'FI_MPSS_...'
+    queryReportNumber || initialData?.inspectionNumber || ''
   );
+
+  // Fallback prompt dialog for report number if starting fresh without one
+  const [reportNumberModalOpen, setReportNumberModalOpen] = useState<boolean>(false);
+  const [promptReportNumberInput, setPromptReportNumberInput] = useState<string>('');
+  const [promptReportError, setPromptReportError] = useState<string>('');
 
   // Role permissions & Clear all dialog state
   const { user } = useUser();
@@ -597,8 +604,12 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
       if (initialData.inspectionNumber) {
         setInspectionNumber(initialData.inspectionNumber);
       }
+    } else if (queryReportNumber) {
+      setInspectionNumber(queryReportNumber);
+    } else if (!inspectionNumber) {
+      setReportNumberModalOpen(true);
     }
-  }, [initialData]);
+  }, [initialData, queryReportNumber]);
 
   // Keep packing and measure pre-filled from Audit if empty and source value exists
   useEffect(() => {
@@ -707,6 +718,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
 
       const payload = {
         id: currentId,
+        inspectionNumber: inspectionNumber.trim() || undefined,
         poNumber,
         poQuantity: Number(poQuantity) || 0,
         inspectionQuantity: Number(inspectedQty) || 0,
@@ -879,6 +891,7 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
 
   // Check if user has entered any content
   const hasUserWrittenContent = Boolean(
+    (typeof inspectionNumber === 'string' && inspectionNumber.trim() && inspectionNumber !== 'FI_MPSS_...') ||
     (typeof poNumber === 'string' && poNumber.trim()) ||
     (poQuantity !== '' && poQuantity !== 0) ||
     (inspectedQty !== '' && inspectedQty !== 0) ||
@@ -1465,6 +1478,38 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
         {/* ── TAB 1: AUDIT (FULL SHEET LAYOUT TOP TO BOTTOM) ───────────────────── */}
         {activeTab === 1 && (
           <div className="space-y-6">
+            {/* ── 0. REPORT NUMBER SECTION (IN FRONT OF AUDIT PAGE) ─────────────── */}
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-blue-200 dark:border-blue-900/60 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-2 text-sm font-extrabold text-blue-600 dark:text-blue-400">
+                  <FileSpreadsheet className="w-4 h-4 text-blue-500" />
+                  <span>Report Number</span>
+                </div>
+                <span className="text-xs text-slate-400 font-medium">Master Inspection Identifier (Cell B5)</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between mb-1.5">
+                    <span>Report Number</span>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-900">
+                      Primary Identifier
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={inspectionNumber}
+                    onChange={(e) => setInspectionNumber(e.target.value)}
+                    placeholder="e.g. FI_MPSS_1314"
+                    className="w-full p-2.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 font-bold text-sm text-blue-900 dark:text-blue-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
+                    This report number is automatically bound to the audit record and written directly into Cell B5 of the Master Excel sheet.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* 1. Header Information (17 fields) */}
             <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -3305,6 +3350,69 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                 Yes
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── PROMPT DIALOG: REPORT NUMBER ─────────────────────────────────────── */}
+        <Dialog open={reportNumberModalOpen} onOpenChange={setReportNumberModalOpen}>
+          <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800">
+            <DialogHeader>
+              <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1">
+                <FileSpreadsheet className="w-4 h-4 text-blue-500" />
+                <span>New QA Inspection Audit</span>
+              </div>
+              <DialogTitle className="text-xl font-extrabold text-slate-900 dark:text-slate-100">
+                Enter Report Number
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+                Please enter the unique Report Number to begin. This identifier will appear at the front of the audit page and be mapped into your master report.
+              </DialogDescription>
+            </DialogHeader>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const trimmed = promptReportNumberInput.trim();
+                if (!trimmed) {
+                  setPromptReportError('Please enter a valid report number.');
+                  return;
+                }
+                setInspectionNumber(trimmed);
+                setReportNumberModalOpen(false);
+              }}
+              className="mt-4 space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Report Number <span className="text-blue-600 dark:text-blue-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={promptReportNumberInput}
+                  onChange={(e) => {
+                    setPromptReportNumberInput(e.target.value);
+                    if (promptReportError) setPromptReportError('');
+                  }}
+                  placeholder="e.g. FI_MPSS_1314"
+                  autoFocus
+                  className="w-full text-sm px-4 py-2.5 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20 font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {promptReportError && (
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-1.5 font-medium">
+                    {promptReportError}
+                  </p>
+                )}
+              </div>
+
+              <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-3">
+                <Button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-xs cursor-pointer"
+                >
+                  Start Inspection
+                </Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

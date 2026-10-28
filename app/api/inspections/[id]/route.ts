@@ -59,6 +59,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     const {
+      inspectionNumber,
       poNumber,
       poQuantity,
       inspectionQuantity,
@@ -88,6 +89,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const updated = await prisma.inspection.update({
       where: { id },
       data: {
+        inspectionNumber: inspectionNumber !== undefined && String(inspectionNumber).trim() !== '' ? String(inspectionNumber).trim() : existing.inspectionNumber,
         poNumber: poNumber !== undefined ? String(poNumber) : existing.poNumber,
         poQuantity: poQuantity !== undefined ? Number(poQuantity) : existing.poQuantity,
         inspectionQuantity: inspectionQuantity !== undefined ? Number(inspectionQuantity) : existing.inspectionQuantity,

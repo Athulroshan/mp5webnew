@@ -107,6 +107,7 @@ export async function POST(req: Request) {
         inspection = await prisma.inspection.update({
           where: { id },
           data: {
+            inspectionNumber: (providedInspectionNumber && providedInspectionNumber.trim()) ? providedInspectionNumber.trim() : existing.inspectionNumber,
             poNumber: poNumber ?? '',
             poQuantity: Number(poQuantity) || 0,
             inspectionQuantity: Number(inspectionQuantity) || 0,
