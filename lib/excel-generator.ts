@@ -100,7 +100,10 @@ export async function generateInspectionExcelReport(
     auditSheet.getCell(fMap.agentName).value = payload.agentName || 'My Profile Sourcing Solutions';
     auditSheet.getCell(fMap.inspectionDate).value = payload.inspectionDate || new Date().toISOString().split('T')[0];
 
-    auditSheet.getCell(fMap.inspectionNumber).value = payload.inspectionNumber || 'FI_MPSS_1313';
+    if (!payload.inspectionNumber) {
+      throw new Error('Inspection report number is missing. A valid report number is required for Master Excel Cell B5.');
+    }
+    auditSheet.getCell(fMap.inspectionNumber).value = payload.inspectionNumber;
     auditSheet.getCell(fMap.agency).value = 'MPSS Agency';
     auditSheet.getCell(fMap.styleNumber).value = payload.styleNumber || 'YCAT0110';
 

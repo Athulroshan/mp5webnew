@@ -41,10 +41,22 @@ export default function InspectionsDashboard() {
   const [newReportNumber, setNewReportNumber] = useState('');
   const [dialogError, setDialogError] = useState('');
 
-  const handleOpenStartDialog = () => {
-    setNewReportNumber('');
+  const handleOpenStartDialog = async () => {
     setDialogError('');
     setStartDialogOpen(true);
+    try {
+      const res = await fetch('/api/inspections/next-number');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.nextNumber) {
+          setNewReportNumber(data.nextNumber);
+          return;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    setNewReportNumber('');
   };
 
   const handleStartInspection = (e: React.FormEvent) => {

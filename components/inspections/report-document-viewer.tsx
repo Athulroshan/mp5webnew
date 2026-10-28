@@ -234,7 +234,10 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
             <div className="p-6 sm:p-8 space-y-4">
               <div className="border-b border-slate-800 pb-2 flex justify-between items-center">
                 <h2 className="text-base font-black text-slate-900 uppercase">Garment Measurement Audit (MEASURE)</h2>
-                <span className="text-[10px] font-bold text-slate-400">PO: {inspection.poNumber}</span>
+                <div className="flex items-center gap-2 text-[10px] font-bold">
+                  <span className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">{inspection.inspectionNumber}</span>
+                  <span className="text-slate-400">PO: {inspection.poNumber}</span>
+                </div>
               </div>
 
               <div className="border border-slate-800 text-[10px]">
@@ -290,7 +293,10 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
             <div className="p-6 sm:p-8 space-y-4">
               <div className="border-b border-slate-800 pb-2 flex justify-between items-center">
                 <h2 className="text-base font-black text-slate-900 uppercase">Inspection Photos Sheet</h2>
-                <span className="text-[10px] font-bold text-slate-400">{inspectionPhotos.length} photos attached</span>
+                <div className="flex items-center gap-2 text-[10px] font-bold">
+                  <span className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">{inspection.inspectionNumber}</span>
+                  <span className="text-slate-400">{inspectionPhotos.length} photos attached</span>
+                </div>
               </div>
 
               {inspectionPhotos.length === 0 ? (
@@ -313,7 +319,7 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
                               target.style.display = 'none';
                               const parent = target.parentElement;
                               if (parent && !parent.querySelector('.photo-fallback')) {
-                                const placeholder = document.createElement('div');
+                                 const placeholder = document.createElement('div');
                                 placeholder.className = 'photo-fallback w-full h-44 flex flex-col items-center justify-center bg-slate-200 text-slate-400 text-xs rounded border border-dashed';
                                 placeholder.innerHTML = '<span>Photo unavailable</span>';
                                 parent.insertBefore(placeholder, target);
@@ -341,7 +347,10 @@ export function ReportDocumentViewer({ inspection, page = 1, zoom = 100 }: Docum
             <div className="p-6 sm:p-8 space-y-4">
               <div className="border-b border-slate-800 pb-2 flex justify-between items-center">
                 <h2 className="text-base font-black text-slate-900 uppercase">Defects & Corrective Action Plan (CAP)</h2>
-                <span className="text-[10px] font-bold text-red-600">{defects.length} defects logged</span>
+                <div className="flex items-center gap-2 text-[10px] font-bold">
+                  <span className="font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">{inspection.inspectionNumber}</span>
+                  <span className="text-red-600">{defects.length} defects logged</span>
+                </div>
               </div>
 
               <div className="border border-slate-800 text-[10px]">
