@@ -98,8 +98,6 @@ const sortOptions = [
   { label: "Latest", value: "-createdAt" },
   { label: "Oldest", value: "createdAt" },
   { label: "Name A–Z", value: "name" },
-  { label: "Price: Low to High", value: "price" },
-  { label: "Price: High to Low", value: "-price" },
 ];
 
 const trustStatements = [
@@ -335,11 +333,6 @@ function ProductCard({
               <span className="text-[11px] font-bold text-[#C8452A] uppercase tracking-wider">
                 {product.category}
               </span>
-              {discount > 0 && (
-                <span className="text-[11px] font-bold text-[#C8452A] bg-[#F7ECE9] px-2 py-0.5 rounded-full">
-                  Save {discount}%
-                </span>
-              )}
             </div>
 
             <Link href={`/products/${product.id}`} className="block group">
@@ -354,15 +347,10 @@ function ProductCard({
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-[#E6D6BD]/60 mt-auto">
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-extrabold text-[#1F1F1F]">
-                {formatINR(product.price)}
+            <div className="flex items-center gap-2">
+              <span className="text-base sm:text-lg font-bold text-[#1F1F1F]">
+                Price on Request
               </span>
-              {product.originalPrice && (
-                <span className="text-xs text-[#7A746E] line-through font-normal">
-                  {formatINR(product.originalPrice)}
-                </span>
-              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -412,11 +400,6 @@ function ProductCard({
               {product.badge}
             </Badge>
           )}
-          {discount > 0 && (
-            <Badge className="absolute top-3 right-3 z-20 pointer-events-none text-xs bg-[#1F1F1F] text-white font-bold border-0 rounded-full px-2.5 py-0.5">
-              -{discount}%
-            </Badge>
-          )}
 
           {/* Prev / Next Arrows */}
           {images.length > 1 && (
@@ -464,11 +447,6 @@ function ProductCard({
           {product.badge && (
             <Badge className="absolute top-3 left-3 z-20 pointer-events-none text-xs bg-[#C8452A] text-white font-bold border-0 rounded-full px-3 py-1 shadow-xs">
               {product.badge}
-            </Badge>
-          )}
-          {discount > 0 && (
-            <Badge className="absolute top-3 right-3 z-20 pointer-events-none text-xs bg-[#1F1F1F] text-white font-bold border-0 rounded-full px-2.5 py-0.5">
-              -{discount}%
             </Badge>
           )}
           <div className="w-16 h-16 rounded-2xl bg-white/90 border border-[#E6D6BD] flex items-center justify-center text-[#C8452A] shadow-xs group-hover:scale-105 transition-transform mb-2.5">
@@ -531,15 +509,10 @@ function ProductCard({
 
         {/* Footer: Price + View Details link + Round Arrow Button */}
         <div className="pt-3 border-t border-[#E6D6BD]/60 flex items-center justify-between mt-auto">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-base font-extrabold text-[#1F1F1F]">
-              {formatINR(product.price)}
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-bold text-[#1F1F1F]">
+              Price on Request
             </span>
-            {product.originalPrice && (
-              <span className="text-xs text-[#7A746E] line-through font-normal">
-                {formatINR(product.originalPrice)}
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-2">

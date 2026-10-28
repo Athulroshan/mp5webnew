@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShoppingCart, Heart, ArrowLeft, Check, Truck, Shield, RotateCcw, Shirt } from "lucide-react";
+import { ShoppingCart, Heart, ArrowLeft, ArrowRight, Check, Truck, Shield, RotateCcw, Shirt } from "lucide-react";
 import { useCart, formatINR } from "@/lib/cart-context";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,22 +163,12 @@ export default function ProductDetailPage() {
                     {product.badge}
                   </span>
                 )}
-                {discount > 0 && (
-                  <span className="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-[#1F1F1F] text-white">
-                    -{discount}%
-                  </span>
-                )}
               </div>
             ) : (
               <div className="relative aspect-square rounded-[24px] bg-[#F3E6D3]/60 border border-[#E8DAC8] flex flex-col items-center justify-center p-8 text-center shadow-xs">
                 {product.badge && (
                   <span className="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-[#C8452A] text-white shadow-xs">
                     {product.badge}
-                  </span>
-                )}
-                {discount > 0 && (
-                  <span className="absolute top-4 right-4 text-xs font-bold px-3 py-1 rounded-full bg-[#1F1F1F] text-white">
-                    -{discount}%
                   </span>
                 )}
                 <div className="w-20 h-20 rounded-3xl bg-white/90 border border-[#E8DAC8] flex items-center justify-center text-[#C8452A] shadow-xs mb-3">
@@ -214,14 +204,11 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-extrabold text-[#1F1F1F]">{formatINR(product.price)}</span>
-              {product.originalPrice && (
-                <>
-                  <span className="text-lg text-[#7A746E] line-through font-normal">{formatINR(product.originalPrice)}</span>
-                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#EFF3EB] text-[#4A5B38]">Save {discount}%</span>
-                </>
-              )}
+            <div className="flex items-center gap-3">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#1F1F1F]">Price on Request</span>
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#F3E6D3] text-[#C8452A] border border-[#E6D6BD]">
+                Customized Order
+              </span>
             </div>
 
             <p className="text-[#4A4540] text-base leading-relaxed">{product.description}</p>
@@ -279,35 +266,45 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Quantity + Add to cart */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <div className="inline-flex items-center border border-[#E8DAC8] bg-white rounded-full overflow-hidden w-fit">
-                <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="px-4 py-2.5 text-[#4A4540] hover:bg-[#F3E6D3] transition-colors font-bold"
-                >
-                  −
-                </button>
-                <span className="px-5 py-2.5 text-center text-[#1F1F1F] font-bold min-w-[3rem]">{quantity}</span>
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="px-4 py-2.5 text-[#4A4540] hover:bg-[#F3E6D3] transition-colors font-bold"
-                >
-                  +
-                </button>
-              </div>
-              <Button
-                size="lg"
-                className="btn-pill-primary flex-1 py-3 text-sm"
-                onClick={handleAddToCart}
-                disabled={product.stock === 0}
+            {/* Quantity + Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Link
+                href={`/contact?subject=${encodeURIComponent(`Pricing & Customization Enquiry: ${product.name}`)}`}
+                className="btn-pill-primary flex-1 py-3 text-sm text-center font-bold flex items-center justify-center gap-2"
               >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-              </Button>
-              <Button size="lg" variant="outline" className="btn-pill-secondary px-4">
-                <Heart className="h-4 w-4 text-[#C8452A]" />
-              </Button>
+                <span>Request Custom Quote</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <div className="flex items-center gap-3">
+                <div className="inline-flex items-center border border-[#E8DAC8] bg-white rounded-full overflow-hidden w-fit">
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="px-3.5 py-2.5 text-[#4A4540] hover:bg-[#F3E6D3] transition-colors font-bold text-sm"
+                  >
+                    −
+                  </button>
+                  <span className="px-3 py-2.5 text-center text-[#1F1F1F] font-bold min-w-[2.5rem] text-sm">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity((q) => q + 1)}
+                    className="px-3.5 py-2.5 text-[#4A4540] hover:bg-[#F3E6D3] transition-colors font-bold text-sm"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="btn-pill-secondary px-4 text-xs font-bold"
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  title="Add to Enquiry Cart"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-1.5" />
+                  Add to Cart
+                </Button>
+              </div>
             </div>
 
             {/* Simple Product Highlights */}
