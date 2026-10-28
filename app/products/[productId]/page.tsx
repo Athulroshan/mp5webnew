@@ -127,10 +127,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
-
   return (
     <div className="min-h-screen bg-[#FBF3E8] text-[#1F1F1F]">
       {/* Toast */}

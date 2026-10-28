@@ -217,10 +217,6 @@ function ProductCard({
     setCurrentIdx(idx);
   };
 
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0;
-
   // ── List View Layout ──
   if (viewMode === "list") {
     return (
@@ -346,28 +342,19 @@ function ProductCard({
             </p>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[#E6D6BD]/60 mt-auto">
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-bold text-[#1F1F1F]">
-                Price on Request
-              </span>
-            </div>
+          <div className="flex items-center justify-between pt-4 border-t border-[#E6D6BD]/60 mt-auto gap-4">
+            <span className="text-base sm:text-lg font-bold text-[#1F1F1F]">
+              Price on Request
+            </span>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/products/${product.id}`}
-                className="text-sm font-bold text-[#C8452A] hover:underline inline-flex items-center gap-1 min-h-[44px] px-2"
-              >
-                View Details →
-              </Link>
-              <Link
-                href={`/products/${product.id}`}
-                aria-label={`View details of ${product.name}`}
-                className="w-10 h-10 rounded-full bg-[#F3E6D3] text-[#C8452A] hover:bg-[#C8452A] hover:text-white flex items-center justify-center transition-all duration-150 shadow-xs"
-              >
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+            <Link
+              href={`/products/${product.id}`}
+              aria-label={`View details of ${product.name}`}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#F3E6D3] text-[#C8452A] hover:bg-[#C8452A] hover:text-white text-xs sm:text-sm font-bold transition-all shadow-xs shrink-0"
+            >
+              <span>View Details</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </div>
@@ -507,29 +494,20 @@ function ProductCard({
           </p>
         </div>
 
-        {/* Footer: Price + View Details link + Round Arrow Button */}
-        <div className="pt-3 border-t border-[#E6D6BD]/60 flex items-center justify-between mt-auto">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-bold text-[#1F1F1F]">
-              Price on Request
-            </span>
-          </div>
+        {/* Footer: Price on Request + Unified View Details button */}
+        <div className="pt-3 border-t border-[#E6D6BD]/60 flex items-center justify-between mt-auto gap-2">
+          <span className="text-xs sm:text-sm font-bold text-[#1F1F1F]">
+            Price on Request
+          </span>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/products/${product.id}`}
-              className="text-xs font-bold text-[#C8452A] hover:underline inline-flex items-center gap-0.5 min-h-[44px] px-1"
-            >
-              View Details →
-            </Link>
-            <Link
-              href={`/products/${product.id}`}
-              aria-label={`View details of ${product.name}`}
-              className="w-9 h-9 rounded-full bg-[#F3E6D3] text-[#C8452A] hover:bg-[#C8452A] hover:text-white flex items-center justify-center transition-all duration-150 shadow-xs"
-            >
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+          <Link
+            href={`/products/${product.id}`}
+            aria-label={`View details of ${product.name}`}
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F3E6D3] text-[#C8452A] hover:bg-[#C8452A] hover:text-white text-xs font-bold transition-all shadow-xs shrink-0"
+          >
+            <span>View Details</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
     </div>
