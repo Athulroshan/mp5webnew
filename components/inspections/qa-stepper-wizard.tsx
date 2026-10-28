@@ -25,6 +25,7 @@ import {
   PenTool,
   Lock,
   Copy,
+  Pencil,
   ShieldAlert,
   ClipboardList,
   Layers,
@@ -271,6 +272,8 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
   );
 
   const [copiedReportNum, setCopiedReportNum] = useState(false);
+  const [isEditingReportNumber, setIsEditingReportNumber] = useState(false);
+  const reportNumberInputRef = useRef<HTMLInputElement>(null);
   const handleCopyReportNumber = async () => {
     if (!inspectionNumber) return;
     try {
@@ -1388,15 +1391,6 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                 <span className="text-xs font-black tracking-wide text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/80 px-2.5 py-0.5 rounded-md border border-blue-200 dark:border-blue-900">
                   {inspectionNumber || 'Pending ID'}
                 </span>
-                {isReportLocked && (
-                  <span
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800"
-                    title="Report Number is permanent and cannot be edited."
-                  >
-                    <Lock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                    Locked ID
-                  </span>
-                )}
                 <span className="text-xs font-extrabold text-slate-400">
                   {poNumber ? `PO #${poNumber}` : 'New QA Inspection'}
                 </span>
@@ -1519,96 +1513,76 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
         {activeTab === 1 && (
           <div className="space-y-6">
             {/* ── 0. REPORT NUMBER SECTION (IN FRONT OF AUDIT PAGE) ─────────────── */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-blue-200 dark:border-blue-900/60 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                <div className="flex items-center gap-2 text-sm font-extrabold text-blue-600 dark:text-blue-400">
+                <div className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
                   <FileSpreadsheet className="w-4 h-4 text-blue-500" />
                   <span>Report Number</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {isReportLocked ? (
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-200 dark:border-amber-800">
-                      <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                      Locked &bull; Permanent ID
-                    </span>
-                  ) : (
-                    <span className="text-xs text-slate-400 font-medium">Master Inspection Identifier (Cell B5)</span>
-                  )}
-                </div>
+                <span className="text-xs text-slate-400 font-medium">Master Inspection Identifier (Cell B5)</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between mb-1.5">
-                    <span className="flex items-center gap-1.5">
-                      <span>Report Number</span>
-                      {isReportLocked && <Lock className="w-3.5 h-3.5 text-slate-400" />}
-                    </span>
-                    <span
-                      className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
-                        isReportLocked
-                          ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                          : 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900'
-                      }`}
-                    >
-                      {isReportLocked ? 'Non-Editable Identifier' : 'Primary Identifier'}
-                    </span>
+                  <label className="font-bold text-slate-600 dark:text-slate-400 flex items-center justify-between mb-1.5">
+                    <span>Report Number</span>
+                    {isEditingReportNumber ? (
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Editing Mode</span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-medium">Click Edit to change</span>
+                    )}
                   </label>
 
                   <div className="relative flex items-center">
                     <input
+                      ref={reportNumberInputRef}
                       type="text"
                       value={inspectionNumber}
-                      onChange={isReportLocked ? undefined : (e) => setInspectionNumber(e.target.value)}
-                      readOnly={isReportLocked}
-                      onKeyDown={
-                        isReportLocked
-                          ? (e) => {
-                              // Allow copy shortcuts (Ctrl+C / Cmd+C / Ctrl+A) and navigational keys
-                              if (
-                                !(
-                                  (e.ctrlKey || e.metaKey) &&
-                                  (e.key === 'c' || e.key === 'C' || e.key === 'a' || e.key === 'A')
-                                ) &&
-                                e.key !== 'Tab' &&
-                                e.key !== 'ArrowLeft' &&
-                                e.key !== 'ArrowRight'
-                              ) {
-                                e.preventDefault();
-                              }
-                            }
-                          : undefined
-                      }
-                      onPaste={isReportLocked ? (e) => e.preventDefault() : undefined}
-                      onCut={isReportLocked ? (e) => e.preventDefault() : undefined}
+                      onChange={(e) => setInspectionNumber(e.target.value)}
+                      readOnly={!isEditingReportNumber}
                       placeholder="e.g. FI_MPSS_0001"
-                      className={`w-full p-2.5 pr-24 rounded-xl border font-bold text-sm transition ${
-                        isReportLocked
-                          ? 'border-slate-300 dark:border-slate-700 bg-slate-100/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 cursor-not-allowed select-all focus:outline-none'
-                          : 'border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 text-blue-900 dark:text-blue-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      className={`w-full p-2.5 pr-32 rounded-xl border font-bold text-sm transition ${
+                        isEditingReportNumber
+                          ? 'border-blue-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                          : 'border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 cursor-default focus:outline-none'
                       }`}
-                      title={
-                        isReportLocked
-                          ? 'Report Number is permanent and cannot be edited.'
-                          : 'Enter or confirm unique report number'
-                      }
                     />
 
-                    {/* Copy and Lock Status Controls inside input */}
+                    {/* Action buttons inside input */}
                     <div className="absolute right-2 flex items-center gap-1.5">
-                      {isReportLocked && (
-                        <div
-                          className="text-slate-400 p-1"
-                          title="Report Number is permanent and cannot be edited."
+                      {isEditingReportNumber ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsEditingReportNumber(false);
+                            saveDraft();
+                          }}
+                          className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-2xs transition active:scale-95 cursor-pointer"
+                          title="Save report number"
                         >
-                          <Lock className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                        </div>
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Done</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsEditingReportNumber(true);
+                            setTimeout(() => reportNumberInputRef.current?.focus(), 50);
+                          }}
+                          className="flex items-center gap-1 px-2 py-1 text-[11px] font-semibold bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-lg shadow-2xs transition active:scale-95 cursor-pointer"
+                          title="Edit report number"
+                        >
+                          <Pencil className="w-3 h-3 text-slate-500" />
+                          <span>Edit</span>
+                        </button>
                       )}
+
                       <button
                         type="button"
                         onClick={handleCopyReportNumber}
                         disabled={!inspectionNumber}
-                        className="flex items-center gap-1 px-2 py-1 text-[11px] font-bold bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-lg shadow-2xs transition active:scale-95 cursor-pointer"
+                        className="flex items-center gap-1 px-2 py-1 text-[11px] font-semibold bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 rounded-lg shadow-2xs transition active:scale-95 cursor-pointer"
                         title="Copy Report Number to clipboard"
                       >
                         {copiedReportNum ? (
@@ -1625,19 +1599,6 @@ export function QAStepperWizard({ initialData }: QAStepperProps) {
                       </button>
                     </div>
                   </div>
-
-                  {isReportLocked ? (
-                    <div className="flex items-start gap-1.5 mt-2 p-2 rounded-lg bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 text-[11px] text-amber-900 dark:text-amber-200">
-                      <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                      <span>
-                        <strong>Report Number is permanent and cannot be edited.</strong> It acts as the single source of truth across all sections, headers, generated documents, and Master Excel Cell B5.
-                      </span>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
-                      This report number is automatically bound to the audit record and written directly into Cell B5 of the Master Excel sheet.
-                    </p>
-                  )}
                 </div>
               </div>
             </div>

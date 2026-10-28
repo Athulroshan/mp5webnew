@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import {
   sbFindInspectionById,
+  sbFindInspectionByNumber,
   sbUpdateInspection,
 } from '@/lib/supabase-inspections';
 
@@ -101,22 +102,35 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       currentVersion,
     } = body;
 
-    // Strict Backend Validation: Reject attempts to change Report Number
+    // If user updated the Report Number, validate uniqueness across other reports
+    let finalInspectionNumber = existing.inspectionNumber;
     if (
       inspectionNumber !== undefined &&
       String(inspectionNumber).trim() !== '' &&
       String(inspectionNumber).trim() !== existing.inspectionNumber
     ) {
-      return NextResponse.json(
-        {
-          error: `Report Number is permanent and cannot be modified after creation (Assigned: ${existing.inspectionNumber}).`,
-        },
-        { status: 400 }
-      );
+      const candidate = String(inspectionNumber).trim();
+      let conflict: any = null;
+      try {
+        conflict = await prisma.inspection.findFirst({
+          where: { inspectionNumber: candidate, NOT: { id } },
+        });
+      } catch {
+        conflict = await sbFindInspectionByNumber(candidate);
+        if (conflict && conflict.id === id) conflict = null;
+      }
+
+      if (conflict) {
+        return NextResponse.json(
+          { error: `Report Number "${candidate}" is already in use by another inspection report.` },
+          { status: 409 }
+        );
+      }
+      finalInspectionNumber = candidate;
     }
 
     const updatePayload = {
-      inspectionNumber: existing.inspectionNumber, // Strictly locked to permanent ID
+      inspectionNumber: finalInspectionNumber,
       poNumber: poNumber !== undefined ? String(poNumber) : existing.poNumber,
       poQuantity: poQuantity !== undefined ? Number(poQuantity) : existing.poQuantity,
       inspectionQuantity: inspectionQuantity !== undefined ? Number(inspectionQuantity) : existing.inspectionQuantity,

@@ -163,23 +163,36 @@ export async function POST(req: Request) {
       }
 
       if (existing) {
-        // Strict Validation: Reject attempts to modify the permanent Report Number
+        // If user updated the Report Number, validate uniqueness across other reports
+        let finalInspectionNumber = existing.inspectionNumber;
         if (
           providedInspectionNumber &&
           providedInspectionNumber.trim() !== '' &&
           providedInspectionNumber.trim() !== existing.inspectionNumber
         ) {
-          return NextResponse.json(
-            {
-              error: `Report Number is permanent and cannot be modified after creation (Assigned: ${existing.inspectionNumber}).`,
-            },
-            { status: 400 }
-          );
+          const candidate = providedInspectionNumber.trim();
+          let conflict: any = null;
+          try {
+            conflict = await prisma.inspection.findFirst({
+              where: { inspectionNumber: candidate, NOT: { id } },
+            });
+          } catch {
+            conflict = await sbFindInspectionByNumber(candidate);
+            if (conflict && conflict.id === id) conflict = null;
+          }
+
+          if (conflict) {
+            return NextResponse.json(
+              { error: `Report Number "${candidate}" is already in use by another inspection report.` },
+              { status: 409 }
+            );
+          }
+          finalInspectionNumber = candidate;
         }
 
-        // Update existing draft. CRITICAL: Never alter or regenerate inspectionNumber on update!
+        // Update existing draft with finalInspectionNumber
         const updateData = {
-          inspectionNumber: existing.inspectionNumber, // Permanently locked to existing record
+          inspectionNumber: finalInspectionNumber,
           poNumber: poNumber ?? '',
           poQuantity: Number(poQuantity) || 0,
           inspectionQuantity: Number(inspectionQuantity) || 0,
